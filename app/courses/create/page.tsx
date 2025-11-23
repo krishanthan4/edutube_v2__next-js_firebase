@@ -12,6 +12,7 @@ export default function CreateCourse() {
   const [description, setDescription] = useState('');
   const [playlistUrl, setPlaylistUrl] = useState('');
   const [categoryId, setCategoryId] = useState('');
+  const [isPublic, setIsPublic] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
   const [fetchingPlaylist, setFetchingPlaylist] = useState(false);
@@ -90,7 +91,8 @@ export default function CreateCourse() {
         videoCount: playlistData.videos.length,
         videos: playlistData.videos,
         createdBy: user.uid,
-        category: categories.find(cat => cat.id === categoryId)?.name || ''
+        category: categories.find(cat => cat.id === categoryId)?.name || '',
+        isPublic: isPublic
       };
 
       const courseId = await createCourse(courseData);
@@ -224,6 +226,29 @@ export default function CreateCourse() {
                   </Link>
                 </p>
               )}
+            </div>
+
+            <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
+              <div className="flex items-center">
+                <input
+                  id="isPublic"
+                  type="checkbox"
+                  checked={isPublic}
+                  onChange={(e) => setIsPublic(e.target.checked)}
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                />
+                <label htmlFor="isPublic" className="ml-3 block text-sm font-medium text-gray-700">
+                  Make this course public
+                </label>
+              </div>
+              <p className="mt-2 text-sm text-gray-500">
+                Public courses can be viewed by anyone without signing in. Private courses require authentication.
+                {isPublic && (
+                  <span className="block mt-1 text-green-700 font-medium">
+                    ✓ This course will be accessible via shareable public URLs
+                  </span>
+                )}
+              </p>
             </div>
 
             <div className="flex items-center justify-between pt-6">

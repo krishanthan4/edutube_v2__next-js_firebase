@@ -35,6 +35,16 @@ yarn-error.log*
 .env.local
 !.env.sample
 
+# public uploaded images (keep directories but ignore files)
+/public/guidance-images/*
+!/public/guidance-images/.gitkeep
+/public/profile-images/*
+!/public/profile-images/.gitkeep
+/public/course-thumbnails/*
+!/public/course-thumbnails/.gitkeep
+/public/category-images/*
+!/public/category-images/.gitkeep
+
 /public/test
 # vercel
 .vercel

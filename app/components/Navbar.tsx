@@ -77,6 +77,20 @@ export default function Navbar() {
             <div className="ml-4 flex items-center md:ml-6">
               {user ? (
                 <div className="flex items-center space-x-4">
+                  <Link
+                    href="/profile"
+                    className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100"
+                    title="My Profile"
+                  >
+                    Profile
+                  </Link>
+                  <Link
+                    href="/settings"
+                    className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100"
+                    title="Account Settings"
+                  >
+                    Settings
+                  </Link>
                   <span className="text-sm text-gray-700">
                     {user.email}
                   </span>
@@ -148,6 +162,20 @@ export default function Navbar() {
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   Manage Categories
+                </Link>
+                <Link
+                  href="/profile"
+                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Profile
+                </Link>
+                <Link
+                  href="/settings"
+                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Settings
                 </Link>
                 {isAdmin && isAdmin() && (
                   <Link

@@ -37,6 +37,9 @@ export interface UserProgress {
   completed: boolean;
   completedAt?: any;
   updatedAt?: any;
+  lastWatched?: any;
+  totalWatchTime?: number; // in minutes
+  progress?: number; // percentage 0-100
 }
 
 export interface PlaylistData {
@@ -52,8 +55,16 @@ export interface User {
   displayName?: string;
   photoURL?: string;
   role: 'admin' | 'user';
+  bio?: string;
   createdAt?: any;
   lastLoginAt?: any;
+  lastActiveAt?: any;
+  updatedAt?: any;
+  emailNotifications?: boolean;
+  publicProfile?: boolean;
+  profileViews?: number;
+  currentStreak?: number;
+  completedGuidances?: number;
 }
 
 export interface Guidance {
@@ -95,23 +106,34 @@ export interface DailyActivity {
   id: string;
   userId: string;
   date: string; // YYYY-MM-DD format
+  coursesCompleted: number;
+  videosWatched: number;
+  guidancesCompleted: number;
+  totalWatchTime: number; // in minutes
+  streakDay: number;
   activities: ActivityType[];
-  streakCount?: number;
+  createdAt?: any;
+  updatedAt?: any;
 }
 
 export interface ActivityType {
   type: 'course_completed' | 'video_watched' | 'guidance_read' | 'course_created';
   resourceId: string;
+  resourceTitle: string;
   timestamp: any;
 }
 
 export interface UserStats {
   userId: string;
-  totalCoursesCompleted: number;
-  totalVideosWatched: number;
-  totalGuidancesRead: number;
+  totalCourses: number;
+  completedCourses: number;
+  totalVideos: number;
+  totalWatchTime: number;
   currentStreak: number;
   longestStreak: number;
+  totalDays: number;
+  totalGuidancesRead: number;
   lastActiveDate: string;
+  createdAt?: any;
   updatedAt?: any;
 }

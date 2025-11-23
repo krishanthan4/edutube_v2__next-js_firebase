@@ -1,8 +1,8 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { collection, getDocs, addDoc, doc, updateDoc, getDoc } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { db, storage } from '../../../../lib/firebase';
+import { db } from '../../../../lib/firebase';
+import { uploadImageToPublic, validateImageFile } from '../../../../lib/imageUpload';
 import { Category } from '../../../../types';
 import { useAuth } from '../../../../contexts/AuthContext';
 import { useRouter } from 'next/navigation';
@@ -94,17 +94,16 @@ export default function CreateGuidance({ params }: CreateGuidanceProps) {
     
     setUploading(true);
     try {
-      // Create organized path structure
-      const fileName = `${Date.now()}_${file.name}`;
-      const imagePath = `guidances/images/${fileName}`;
-      const imageRef = ref(storage, imagePath);
+      // Validate the image file
+      validateImageFile(file);
       
-      await uploadBytes(imageRef, file);
-      const downloadURL = await getDownloadURL(imageRef);
+      // Upload to public folder
+      const imageUrl = await uploadImageToPublic(file, 'guidance-images');
       
-      return downloadURL;
+      return imageUrl;
     } catch (error) {
       console.error('Failed to upload image:', error);
+      alert(error instanceof Error ? error.message : 'Failed to upload image');
       return '';
     } finally {
       setUploading(false);
