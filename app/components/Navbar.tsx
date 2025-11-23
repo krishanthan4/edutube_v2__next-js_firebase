@@ -7,7 +7,9 @@ import { HiMenu, HiX } from 'react-icons/hi';
 
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { user, logout } = useAuth();
+  const auth = useAuth();
+  const { user, logout } = auth;
+  const isAdmin = (auth as any).isAdmin;
   const router = useRouter();
 
   const handleLogout = async () => {
@@ -57,6 +59,14 @@ export default function Navbar() {
                   >
                     Manage Categories
                   </Link>
+                  {isAdmin && isAdmin() && (
+                    <Link
+                      href="/admin"
+                      className="px-3 py-2 rounded-md text-sm font-medium text-white bg-red-600 hover:bg-red-700 border border-red-600"
+                    >
+                      Admin Panel
+                    </Link>
+                  )}
                 </>
               )}
             </div>
@@ -139,6 +149,15 @@ export default function Navbar() {
                 >
                   Manage Categories
                 </Link>
+                {isAdmin && isAdmin() && (
+                  <Link
+                    href="/admin"
+                    className="block px-3 py-2 rounded-md text-base font-medium text-white bg-red-600 hover:bg-red-700"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Admin Panel
+                  </Link>
+                )}
               </>
             )}
             {user ? (

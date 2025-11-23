@@ -18,6 +18,7 @@ export interface Course {
   videos?: Video[];
   createdAt?: any;
   createdBy?: string;
+  isPublic?: boolean;
 }
 
 export interface Video {
@@ -43,4 +44,74 @@ export interface PlaylistData {
   description: string;
   thumbnail?: string;
   videos: Video[];
+}
+
+export interface User {
+  uid: string;
+  email: string;
+  displayName?: string;
+  photoURL?: string;
+  role: 'admin' | 'user';
+  createdAt?: any;
+  lastLoginAt?: any;
+}
+
+export interface Guidance {
+  id: string;
+  title: string;
+  content: string; // Markdown content
+  description?: string;
+  thumbnail?: string;
+  categoryId: string;
+  category?: string;
+  images?: string[]; // Array of image URLs
+  createdBy: string;
+  createdAt?: any;
+  updatedAt?: any;
+  tags?: string[];
+}
+
+export interface GuidancePathway {
+  id: string;
+  title: string;
+  description: string;
+  categoryId: string;
+  items: PathwayItem[];
+  createdBy: string;
+  createdAt?: any;
+  updatedAt?: any;
+}
+
+export interface PathwayItem {
+  id: string;
+  type: 'course' | 'guidance';
+  resourceId: string;
+  position: number;
+  title: string;
+  dependencies?: string[]; // IDs of prerequisite items
+}
+
+export interface DailyActivity {
+  id: string;
+  userId: string;
+  date: string; // YYYY-MM-DD format
+  activities: ActivityType[];
+  streakCount?: number;
+}
+
+export interface ActivityType {
+  type: 'course_completed' | 'video_watched' | 'guidance_read' | 'course_created';
+  resourceId: string;
+  timestamp: any;
+}
+
+export interface UserStats {
+  userId: string;
+  totalCoursesCompleted: number;
+  totalVideosWatched: number;
+  totalGuidancesRead: number;
+  currentStreak: number;
+  longestStreak: number;
+  lastActiveDate: string;
+  updatedAt?: any;
 }
