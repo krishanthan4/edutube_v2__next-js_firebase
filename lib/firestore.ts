@@ -9,14 +9,19 @@ import {
   query, 
   where, 
   orderBy,
-  serverTimestamp 
+  serverTimestamp,
+  DocumentReference,
+  QuerySnapshot,
+  DocumentData,
+  DocumentSnapshot
 } from 'firebase/firestore';
 import { db } from './firebase';
+import { Category, Course, UserProgress, PlaylistData, Video } from '../types';
 
 // Categories
-export const createCategory = async (categoryData) => {
+export const createCategory = async (categoryData: Omit<Category, 'id' | 'createdAt'>): Promise<string> => {
   try {
-    const docRef = await addDoc(collection(db, 'categories'), {
+    const docRef: DocumentReference = await addDoc(collection(db, 'categories'), {
       ...categoryData,
       createdAt: serverTimestamp()
     });
@@ -27,14 +32,14 @@ export const createCategory = async (categoryData) => {
   }
 };
 
-export const getCategories = async () => {
+export const getCategories = async (): Promise<Category[]> => {
   try {
     const q = query(collection(db, 'categories'), orderBy('name'));
-    const querySnapshot = await getDocs(q);
+    const querySnapshot: QuerySnapshot<DocumentData> = await getDocs(q);
     return querySnapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data()
-    }));
+    } as Category));
   } catch (error) {
     console.error('Error getting categories:', error);
     throw error;
@@ -42,9 +47,9 @@ export const getCategories = async () => {
 };
 
 // Courses
-export const createCourse = async (courseData) => {
+export const createCourse = async (courseData: Omit<Course, 'id' | 'createdAt'>): Promise<string> => {
   try {
-    const docRef = await addDoc(collection(db, 'courses'), {
+    const docRef: DocumentReference = await addDoc(collection(db, 'courses'), {
       ...courseData,
       createdAt: serverTimestamp()
     });
@@ -55,7 +60,7 @@ export const createCourse = async (courseData) => {
   }
 };
 
-export const getCourses = async (categoryId = null) => {
+export const getCourses = async (categoryId: string | null = null): Promise<Course[]> => {
   try {
     let q;
     if (categoryId) {
@@ -68,27 +73,27 @@ export const getCourses = async (categoryId = null) => {
       q = query(collection(db, 'courses'), orderBy('createdAt', 'desc'));
     }
     
-    const querySnapshot = await getDocs(q);
+    const querySnapshot: QuerySnapshot<DocumentData> = await getDocs(q);
     return querySnapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data()
-    }));
+    } as Course));
   } catch (error) {
     console.error('Error getting courses:', error);
     throw error;
   }
 };
 
-export const getCourse = async (courseId) => {
+export const getCourse = async (courseId: string): Promise<Course> => {
   try {
     const docRef = doc(db, 'courses', courseId);
-    const docSnap = await getDoc(docRef);
+    const docSnap: DocumentSnapshot<DocumentData> = await getDoc(docRef);
     
     if (docSnap.exists()) {
       return {
         id: docSnap.id,
         ...docSnap.data()
-      };
+      } as Course;
     } else {
       throw new Error('Course not found');
     }
@@ -99,9 +104,9 @@ export const getCourse = async (courseId) => {
 };
 
 // User Progress
-export const createUserProgress = async (userId, courseId, videoId) => {
+export const createUserProgress = async (userId: string, courseId: string, videoId: string): Promise<string> => {
   try {
-    const docRef = await addDoc(collection(db, 'userProgress'), {
+    const docRef: DocumentReference = await addDoc(collection(db, 'userProgress'), {
       userId,
       courseId,
       videoId,
@@ -115,25 +120,25 @@ export const createUserProgress = async (userId, courseId, videoId) => {
   }
 };
 
-export const getUserProgress = async (userId, courseId) => {
+export const getUserProgress = async (userId: string, courseId: string): Promise<UserProgress[]> => {
   try {
     const q = query(
       collection(db, 'userProgress'),
       where('userId', '==', userId),
       where('courseId', '==', courseId)
     );
-    const querySnapshot = await getDocs(q);
+    const querySnapshot: QuerySnapshot<DocumentData> = await getDocs(q);
     return querySnapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data()
-    }));
+    } as UserProgress));
   } catch (error) {
     console.error('Error getting user progress:', error);
     throw error;
   }
 };
 
-export const updateUserProgress = async (progressId, data) => {
+export const updateUserProgress = async (progressId: string, data: Partial<UserProgress>): Promise<void> => {
   try {
     const docRef = doc(db, 'userProgress', progressId);
     await updateDoc(docRef, {
@@ -147,7 +152,7 @@ export const updateUserProgress = async (progressId, data) => {
 };
 
 // YouTube API functions
-export const fetchPlaylistData = async (playlistUrl) => {
+export const fetchPlaylistData = async (playlistUrl: string): Promise<PlaylistData> => {
   const apiKey = process.env.NEXT_PUBLIC_YOUTUBE_API_KEY;
   const playlistId = extractPlaylistId(playlistUrl);
   
@@ -176,7 +181,7 @@ export const fetchPlaylistData = async (playlistUrl) => {
       title: playlistData.items[0].snippet.title,
       description: playlistData.items[0].snippet.description,
       thumbnail: playlistData.items[0].snippet.thumbnails?.medium?.url || playlistData.items[0].snippet.thumbnails?.default?.url,
-      videos: itemsData.items.map(item => ({
+      videos: itemsData.items.map((item: any): Video => ({
         id: item.snippet.resourceId.videoId,
         title: item.snippet.title,
         description: item.snippet.description,
@@ -191,7 +196,7 @@ export const fetchPlaylistData = async (playlistUrl) => {
 };
 
 // Helper function to extract playlist ID from URL
-const extractPlaylistId = (url) => {
+const extractPlaylistId = (url: string): string | null => {
   const regex = /list=([A-Za-z0-9_-]+)/;
   const match = url.match(regex);
   return match ? match[1] : null;

@@ -1,32 +1,41 @@
 'use client';
 import { useState } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../../contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { FcGoogle } from 'react-icons/fc';
 
-export default function Login() {
+export default function Signup() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [passwordConfirm, setPasswordConfirm] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login, signInWithGoogle } = useAuth();
+  const { signup, signInWithGoogle } = useAuth();
   const router = useRouter();
 
-  async function handleSubmit(e) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
-    if (!email || !password) {
+    if (!email || !password || !passwordConfirm) {
       return setError('Please fill in all fields');
+    }
+
+    if (password !== passwordConfirm) {
+      return setError('Passwords do not match');
+    }
+
+    if (password.length < 6) {
+      return setError('Password must be at least 6 characters');
     }
 
     try {
       setError('');
       setLoading(true);
-      await login(email, password);
+      await signup(email, password);
       router.push('/');
     } catch (error) {
-      setError('Failed to log in. Please check your credentials.');
+      setError('Failed to create an account. This email may already be in use.');
       console.error(error);
     } finally {
       setLoading(false);
@@ -52,7 +61,7 @@ export default function Login() {
       <div className="max-w-md w-full bg-white p-8 rounded-lg shadow-md">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">EduTube</h1>
-          <p className="text-gray-600 mt-2">Sign in to your account</p>
+          <p className="text-gray-600 mt-2">Create your account</p>
         </div>
 
         {error && (
@@ -92,12 +101,27 @@ export default function Login() {
             />
           </div>
 
+          <div>
+            <label htmlFor="passwordConfirm" className="block text-sm font-medium text-gray-700">
+              Confirm Password
+            </label>
+            <input
+              id="passwordConfirm"
+              type="password"
+              value={passwordConfirm}
+              onChange={(e) => setPasswordConfirm(e.target.value)}
+              required
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black"
+              placeholder="Confirm your password"
+            />
+          </div>
+
           <button
             type="submit"
             disabled={loading}
             className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black disabled:opacity-50"
           >
-            {loading ? 'Signing in...' : 'Sign In'}
+            {loading ? 'Creating Account...' : 'Sign Up'}
           </button>
         </form>
 
@@ -118,16 +142,16 @@ export default function Login() {
               className="w-full inline-flex justify-center items-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
             >
               <FcGoogle className="h-5 w-5 mr-2" />
-              Sign in with Google
+              Sign up with Google
             </button>
           </div>
         </div>
 
         <div className="mt-6 text-center">
           <p className="text-sm text-gray-600">
-            Don&apos;t have an account?{' '}
-            <Link href="/auth/signup" className="font-medium text-black hover:text-gray-800">
-              Sign up
+            Already have an account?{' '}
+            <Link href="/auth/login" className="font-medium text-black hover:text-gray-800">
+              Sign in
             </Link>
           </p>
         </div>
