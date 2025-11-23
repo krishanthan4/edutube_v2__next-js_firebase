@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, use } from 'react';
 import { useAuth } from '../../../../contexts/AuthContext';
 import { getCourse, getUserProgress, createUserProgress } from '../../../../lib/firestore';
 import { Course, Video, UserProgress } from '../../../../types';
@@ -7,12 +7,13 @@ import { useRouter } from 'next/navigation';
 import Navbar from '../../../components/Navbar';
 
 interface CourseViewerProps {
-  params: {
+  params: Promise<{
     courseId: string;
-  };
+  }>;
 }
 
 export default function CourseViewer({ params }: CourseViewerProps) {
+  const resolvedParams = use(params);
   const [course, setCourse] = useState<Course | null>(null);
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
   const [userProgress, setUserProgress] = useState<UserProgress[]>([]);
@@ -28,11 +29,11 @@ export default function CourseViewer({ params }: CourseViewerProps) {
       try {
         setLoading(true);
         
-        const courseData = await getCourse(params.courseId);
+        const courseData = await getCourse(resolvedParams.courseId);
         setCourse(courseData as Course);
         
         if (user) {
-          const progressData = await getUserProgress(user.uid, params.courseId);
+          const progressData = await getUserProgress(user.uid, resolvedParams.courseId);
           setUserProgress(progressData as UserProgress[]);
         }
         
@@ -45,7 +46,7 @@ export default function CourseViewer({ params }: CourseViewerProps) {
     };
 
     loadCourseData();
-  }, [params.courseId, user]);
+  }, [resolvedParams.courseId, user]);
 
   const getCompletedVideosCount = () => {
     return userProgress.length;
@@ -67,13 +68,13 @@ export default function CourseViewer({ params }: CourseViewerProps) {
     if (!currentVideo || isVideoCompleted(currentVideo.id)) return;
 
     try {
-      await createUserProgress(user.uid, params.courseId, currentVideo.id);
+      await createUserProgress(user.uid, resolvedParams.courseId, currentVideo.id);
       
       // Update local state
       const newProgress: UserProgress = {
         id: '',
         userId: user.uid,
-        courseId: params.courseId,
+        courseId: resolvedParams.courseId,
         videoId: currentVideo.id,
         completed: true,
         completedAt: new Date()
