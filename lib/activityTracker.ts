@@ -4,12 +4,13 @@ import {
   setDoc, 
   updateDoc, 
   getDoc, 
-  query, 
+   
   where, 
   getDocs, 
   orderBy, 
   limit, 
-  Timestamp 
+  Timestamp, 
+  query
 } from 'firebase/firestore';
 import { db } from './firebase';
 import { DailyActivity, ActivityType, UserStats } from '../types';
@@ -256,14 +257,22 @@ export const getUserStats = async (userId: string): Promise<UserStats | null> =>
   }
 };
 
-export const getDailyActivities = async (userId: string, limit?: number): Promise<DailyActivity[]> => {
+export const getDailyActivities = async (userId: string, limitCount?: number): Promise<DailyActivity[]> => {
   try {
-    const activitiesQuery = query(
-      collection(db, 'dailyActivities'),
+    const queryConstraints = [
       where('userId', '==', userId),
-      orderBy('date', 'desc'),
-      ...(limit ? [limit] : [])
-    );
+      orderBy('date', 'desc')
+    ];
+    const activitiesQuery = limitCount
+      ? query(
+          collection(db, 'dailyActivities'),
+          ...queryConstraints,
+          limit(limitCount)
+        )
+      : query(
+          collection(db, 'dailyActivities'),
+          ...queryConstraints
+        );
     
     const activitiesSnapshot = await getDocs(activitiesQuery);
     return activitiesSnapshot.docs.map(doc => ({

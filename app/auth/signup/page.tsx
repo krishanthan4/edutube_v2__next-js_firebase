@@ -60,7 +60,7 @@ export default function Signup() {
     <div className="min-h-screen bg-gray-100 flex items-center justify-center">
       <div className="max-w-md w-full bg-white p-8 rounded-lg shadow-md">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">EduTube</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Edutube</h1>
           <p className="text-gray-600 mt-2">Create your account</p>
         </div>
 

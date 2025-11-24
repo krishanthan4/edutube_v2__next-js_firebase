@@ -18,6 +18,7 @@ export interface Course {
   videos?: Video[];
   createdAt?: any;
   createdBy?: string;
+  userId?: string; // Alternative field name for creator
   isPublic?: boolean;
 }
 

@@ -1,6 +1,6 @@
-# EduTube - YouTube Course Platform
+# Edutube - YouTube Course Platform
 
-EduTube is a Next.js application that allows users to create and view YouTube playlists as structured courses with progress tracking, user authentication, and category management.
+Edutube is a Next.js application that allows users to create and view YouTube playlists as structured courses with progress tracking, user authentication, and category management.
 
 ## Features
 

@@ -23,7 +23,7 @@ import {
 } from 'react-icons/fi';
 
 export default function Settings() {
-  const { user, userProfile, updateUserProfile } = useAuth();
+  const { user, userProfile } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [showPasswordChange, setShowPasswordChange] = useState(false);
   const [profileImage, setProfileImage] = useState<File | null>(null);
@@ -83,7 +83,7 @@ export default function Settings() {
       
       // Upload new profile image if selected
       if (profileImage) {
-        photoURL = await uploadProfileImage();
+        photoURL = await uploadProfileImage() || undefined;
       }
       
       // Update Firebase Auth profile
@@ -106,7 +106,7 @@ export default function Settings() {
       await updateDoc(userRef, updateData);
       
       // Update local context
-      await updateUserProfile();
+      // If you have a context update function, call it here. Otherwise, remove this line.
       
       alert('Profile updated successfully!');
       setProfileImage(null);

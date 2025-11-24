@@ -106,6 +106,7 @@ export const getCourse = async (courseId: string): Promise<Course> => {
 // User Progress
 export const createUserProgress = async (userId: string, courseId: string, videoId: string): Promise<string> => {
   try {
+    console.log('Creating user progress with data:', { userId, courseId, videoId });
     const docRef: DocumentReference = await addDoc(collection(db, 'userProgress'), {
       userId,
       courseId,
@@ -113,9 +114,11 @@ export const createUserProgress = async (userId: string, courseId: string, video
       completed: true,
       completedAt: serverTimestamp()
     });
+    console.log('User progress created successfully with ID:', docRef.id);
     return docRef.id;
   } catch (error) {
     console.error('Error creating user progress:', error);
+    console.error('Error details:', JSON.stringify(error, null, 2));
     throw error;
   }
 };

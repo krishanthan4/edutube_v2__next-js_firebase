@@ -46,7 +46,7 @@ export default function AdminNavbar() {
           {/* Logo */}
           <div className="flex items-center space-x-4">
             <Link href="/admin" className="text-2xl font-bold text-blue-600">
-              EduTube Admin
+              Edutube Admin
             </Link>
           </div>
 

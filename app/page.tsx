@@ -1,437 +1,484 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { getCourses, getCategories } from '../lib/firestore';
-import { Category, Course } from '../types';
+import { getCourses } from '../lib/firestore';
+import { Course } from '../types';
 import Navbar from './components/Navbar';
 import Link from 'next/link';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  FiSearch, 
-  FiFilter, 
-  FiX,
+  FiArrowRight,
   FiBookOpen,
   FiUsers,
+  FiZap,
+  FiStar,
+  FiPlay,
+  FiTarget,
+  FiTrendingUp,
+  FiGlobe,
+  FiShield,
+  FiHeart,
+  FiBarChart,
+  FiShare2,
+  FiFolder,
+  FiCheckCircle,
   FiClock,
-  FiShare2
+  FiAward,
+  FiYoutube,
+  FiX,
+  FiChevronDown,
+  FiChevronUp,
+  FiDollarSign,
+  FiLock,
+  FiUnlock,
+  FiSmartphone,
+  FiMail
 } from 'react-icons/fi';
+import Footer from './components/LandingPage/Footer';
+import CTA from './components/LandingPage/CTA';
+import FAQ from './components/LandingPage/FAQ';
+import Advantages from './components/LandingPage/Advantages';
+import DemoVideo from './components/LandingPage/DemoVideo';
 
 export default function Home() {
-  const [courses, setCourses] = useState<Course[]>([]);
-  const [filteredCourses, setFilteredCourses] = useState<Course[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState('');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'title' | 'videos'>('newest');
-  const [showPublicOnly, setShowPublicOnly] = useState(false);
-  const [showFilters, setShowFilters] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [featuredCourses, setFeaturedCourses] = useState<Course[]>([]);
+  const [stats, setStats] = useState({
+    totalCourses: 0,
+    publicCourses: 0,
+    totalStudents: 0
+  });
+  const [showPremium, setShowPremium] = useState(false);
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
   const { user } = useAuth();
 
-  // Default categories if none exist in Firestore
-  const defaultCategories: Category[] = [
-    { id: 'web-dev', name: 'Web Development', image: 'https://img.freepik.com/premium-photo/conceptual-image-laptop-with-fire-screengenerative-ai_391052-12821.jpg' },
-    { id: 'cybersecurity', name: 'Cybersecurity', image: 'https://akm-img-a-in.tosshub.com/sites/visualstory/stories/2023_03/story_26409/assets/1.jpeg?time=1678872838&size=*:900' },
-    { id: 'mobile-dev', name: 'Mobile Development', image: 'https://techrushi.com/wp-content/uploads/2023/01/Ai-Art-Generator-Wallpapers.jpg' },
-    { id: 'computer-science', name: 'Computer Science', image: 'https://images.unsplash.com/photo-1555949963-aa79dcee981c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80' },
-    { id: 'backend', name: 'Backend Development', image: 'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80' },
-    { id: 'frontend', name: 'Frontend Development', image: 'https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80' }
-  ];
-
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchFeaturedCourses = async () => {
       try {
-        setLoading(true);
+        const allCourses = await getCourses();
+        // Show only public courses for featured section
+        const publicCourses = allCourses.filter(course => course.isPublic);
+        // Get the 6 newest public courses
+        const featured = publicCourses
+          .sort((a, b) => new Date(b.createdAt?.toDate() || 0).getTime() - new Date(a.createdAt?.toDate() || 0).getTime())
+          .slice(0, 6);
         
-        // Fetch categories
-        const fetchedCategories = await getCategories();
-        const categoriesToUse = fetchedCategories.length > 0 ? fetchedCategories : defaultCategories;
-        setCategories(categoriesToUse as Category[]);
-        
-        // Fetch all courses
-        const courseData = await getCourses();
-        setCourses(courseData as Course[]);
+        setFeaturedCourses(featured as Course[]);
+        setStats({
+          totalCourses: allCourses.length,
+          publicCourses: publicCourses.length,
+          totalStudents: Math.floor(Math.random() * 5000) + 1000 // Simulated for demo
+        });
       } catch (error) {
-        console.error('Error fetching data:', error);
-        // Use default categories if fetch fails
-        setCategories(defaultCategories);
-      } finally {
-        setLoading(false);
+        console.error('Error fetching featured courses:', error);
       }
     };
 
-    fetchData();
+    fetchFeaturedCourses();
   }, []);
 
-  // Filter and sort courses
+  // Animation cycle effect
   useEffect(() => {
-    let filtered = [...courses];
+    const animationCycle = () => {
+      setShowPremium(true);
+      setTimeout(() => {
+        setShowPremium(false);
+      }, 3000);
+    };
 
-    // Filter by category
-    if (selectedCategory) {
-      filtered = filtered.filter(course => course.categoryId === selectedCategory);
-    }
+    // Start first animation after 1 second
+    const initialTimeout = setTimeout(animationCycle, 1000);
+    
+    // Repeat every 5 seconds
+    const interval = setInterval(animationCycle, 5000);
 
-    // Filter by search term
-    if (searchTerm) {
-      filtered = filtered.filter(course => 
-        course.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        course.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        course.category?.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-
-    // Filter public only
-    if (showPublicOnly) {
-      filtered = filtered.filter(course => course.isPublic === true);
-    }
-
-    // Sort courses
-    filtered.sort((a, b) => {
-      switch (sortBy) {
-        case 'newest':
-          return new Date(b.createdAt?.toDate() || 0).getTime() - new Date(a.createdAt?.toDate() || 0).getTime();
-        case 'oldest':
-          return new Date(a.createdAt?.toDate() || 0).getTime() - new Date(b.createdAt?.toDate() || 0).getTime();
-        case 'title':
-          return a.title.localeCompare(b.title);
-        case 'videos':
-          return (b.videoCount || 0) - (a.videoCount || 0);
-        default:
-          return 0;
-      }
-    });
-
-    setFilteredCourses(filtered);
-  }, [courses, selectedCategory, searchTerm, sortBy, showPublicOnly]);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-100">
-        <Navbar />
-        <div className="flex items-center justify-center h-96">
-          <div className="text-xl text-gray-600">Loading...</div>
-        </div>
-      </div>
-    );
-  }
+    return () => {
+      clearTimeout(initialTimeout);
+      clearInterval(interval);
+    };
+  }, []);
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-black text-white">
       <Navbar />
       
-      {/* Hero Section */}
-      <div className="relative h-48 md:h-64 bg-linear-to-r from-gray-900 to-black flex items-center justify-center">
-        <div className="text-center text-white">
-          <h1 className="text-3xl md:text-5xl font-bold mb-4">EduTube</h1>
-          <p className="text-lg md:text-xl">Learn Anything For Completely Free</p>
+      {/* Hero Section - YouTube to Premium Courses */}
+      <section className="relative bg-black text-white overflow-hidden min-h-screen flex items-center">
+        <div className="absolute inset-0 bg-black"></div>
+        <div className="absolute inset-0">
+          <div className="absolute top-20 left-20 w-96 h-96 bg-orange-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-blob"></div>
+          <div className="absolute top-40 right-20 w-96 h-96 bg-yellow-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-blob animation-delay-2000"></div>
+          <div className="absolute -bottom-8 left-40 w-96 h-96 bg-orange-400 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-blob animation-delay-4000"></div>
         </div>
-      </div>
-
-      {/* Search and Filters */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          {/* Search Bar */}
-          <div className="flex flex-col md:flex-row gap-4 mb-4">
-            <div className="flex-1 relative">
-              <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <input
-                type="text"
-                placeholder="Search courses..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-              {searchTerm && (
-                <button
-                  onClick={() => setSearchTerm('')}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                >
-                  <FiX className="w-5 h-5" />
-                </button>
-              )}
-            </div>
-            
-            <button
-              onClick={() => setShowFilters(!showFilters)}
-              className={`flex items-center space-x-2 px-4 py-3 border rounded-lg transition-colors ${
-                showFilters 
-                  ? 'border-blue-500 bg-blue-50 text-blue-700' 
-                  : 'border-gray-300 text-gray-700 hover:bg-gray-50'
-              }`}
-            >
-              <FiFilter className="w-5 h-5" />
-              <span>Filters</span>
-              {(selectedCategory || showPublicOnly) && (
-                <span className="bg-blue-600 text-white text-xs px-2 py-1 rounded-full">
-                  {(selectedCategory ? 1 : 0) + (showPublicOnly ? 1 : 0)}
-                </span>
-              )}
-            </button>
-          </div>
-
-          {/* Filters Panel */}
-          {showFilters && (
-            <div className="bg-gray-50 rounded-lg p-4 space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {/* Category Filter */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Category
-                  </label>
-                  <select
-                    value={selectedCategory}
-                    onChange={(e) => setSelectedCategory(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="">All Categories</option>
-                    {categories.map((category) => (
-                      <option key={category.id} value={category.id}>
-                        {category.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Sort By */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Sort By
-                  </label>
-                  <select
-                    value={sortBy}
-                    onChange={(e) => setSortBy(e.target.value as 'newest' | 'oldest' | 'title' | 'videos')}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="newest">Newest First</option>
-                    <option value="oldest">Oldest First</option>
-                    <option value="title">Alphabetical</option>
-                    <option value="videos">Most Videos</option>
-                  </select>
-                </div>
-
-                {/* Public Only */}
-                <div className="flex flex-col justify-center">
-                  <label className="flex items-center space-x-2">
-                    <input
-                      type="checkbox"
-                      checked={showPublicOnly}
-                      onChange={(e) => setShowPublicOnly(e.target.checked)}
-                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                    />
-                    <span className="text-sm font-medium text-gray-700">Public courses only</span>
-                  </label>
+        
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            {/* Left Side - Main Message */}
+            <div>
+              <div className="flex items-center mb-6">
+                <div className="bg-orange-500 text-black px-4 py-2 rounded-full text-sm font-bold flex items-center space-x-2">
+                  <FiZap className="w-4 h-4" />
+                  <span>TRANSFORM YOUR LEARNING</span>
                 </div>
               </div>
               
-              {/* Clear Filters */}
-              {(selectedCategory || showPublicOnly || searchTerm) && (
-                <div className="flex justify-end">
-                  <button
-                    onClick={() => {
-                      setSelectedCategory('');
-                      setShowPublicOnly(false);
-                      setSearchTerm('');
-                    }}
-                    className="text-sm text-gray-600 hover:text-gray-800"
-                  >
-                    Clear all filters
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Results Summary */}
-          <div className="flex items-center justify-between text-sm text-gray-600 mt-4">
-            <span>
-              {filteredCourses.length} course{filteredCourses.length !== 1 ? 's' : ''} found
-              {selectedCategory && ` in ${categories.find(c => c.id === selectedCategory)?.name}`}
-              {searchTerm && ` for "${searchTerm}"`}
-            </span>
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2">
-                <FiBookOpen className="w-4 h-4 text-blue-600" />
-                <span>{courses.length} total courses</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <FiUsers className="w-4 h-4 text-green-600" />
-                <span>{courses.filter(c => c.isPublic).length} public</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Courses Grid */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {filteredCourses.length === 0 && courses.length > 0 ? (
-          <div className="text-center py-12">
-            <FiSearch className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">
-              No courses match your filters
-            </h2>
-            <p className="text-gray-600 mb-8">
-              Try adjusting your search term or filters to find courses.
-            </p>
-            <button
-              onClick={() => {
-                setSelectedCategory('');
-                setShowPublicOnly(false);
-                setSearchTerm('');
-              }}
-              className="text-blue-600 hover:text-blue-800 font-medium"
-            >
-              Clear all filters
-            </button>
-          </div>
-        ) : filteredCourses.length === 0 ? (
-          <div className="text-center py-12">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">
-              No courses found
-            </h2>
-            <p className="text-gray-600 mb-8">
-              No courses have been created yet.
-            </p>
-            {user && (
-              <Link
-                href="/courses/create"
-                className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-black hover:bg-gray-800"
-              >
-                Create Your First Course
-              </Link>
-            )}
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {filteredCourses.map((course) => (
-              <div
-                key={course.id}
-                className="bg-white rounded-md border border-gray-200 shadow-sm hover:shadow-md transition-shadow cursor-pointer group relative"
-              >
-                <Link href={user ? `/courses/${course.id}/viewer` : (course.isPublic ? `/public/courses/${course.id}` : `/auth/login`)}>
-                  <div className="aspect-w-16 aspect-h-9 relative">
-                    <img
-                      src={course.thumbnail || '/api/placeholder/400/225'}
-                      alt={course.title}
-                      className="w-full h-48 object-cover rounded-t-md group-hover:scale-105 transition-transform duration-200"
-                      draggable="false"
-                    />
-                    {course.isPublic && (
-                      <div className="absolute top-2 right-2">
-                        <span className="bg-green-600 text-white text-xs px-2 py-1 rounded-full font-medium">
-                          Public
-                        </span>
-                      </div>
-                    )}
-                    {!user && !course.isPublic && (
-                      <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                        <span className="text-white text-sm font-medium px-3 py-1 bg-blue-600 rounded-full">
-                          Sign in to access
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                  <div className="p-4">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
-                      {course.title}
-                    </h3>
-                    <p className="text-sm text-gray-600 line-clamp-2 mb-3">
-                      {course.description}
-                    </p>
-                    <div className="flex items-center justify-between text-xs text-gray-500 mb-2">
-                      <span className="flex items-center space-x-1">
-                        <FiBookOpen className="w-3 h-3" />
-                        <span>{course.videoCount || 0} lessons</span>
-                      </span>
-                      <span className="flex items-center space-x-1">
-                        <FiClock className="w-3 h-3" />
-                        <span>{new Date(course.createdAt?.toDate() || 0).toLocaleDateString()}</span>
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full">
-                        {course.category || categories.find(c => c.id === course.categoryId)?.name}
-                      </span>
-                      {course.isPublic ? (
-                        <span className="text-xs text-green-600 font-medium">Public</span>
-                      ) : (
-                        <span className="text-xs text-gray-500">Private</span>
-                      )}
-                    </div>
-                  </div>
+              <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">
+                Turn <span className="text-red-500 inline-flex items-center">
+                  <FiYoutube className="w-14 h-14 mr-4" />
+                  YouTube
+                </span>
+                <br />
+                Playlists Into
+                <br />
+                <span className="text-transparent bg-clip-text bg-linear-to-r from-orange-400 to-yellow-500">
+                  Premium Courses
+                </span>
+              </h1>
+              
+              <p className="text-xl md:text-2xl text-gray-300 mb-8 leading-relaxed">
+                Transform scattered YouTube playlists into structured, trackable learning experiences. 
+                Get all the benefits of premium education platforms - <span className="text-orange-400 font-bold">completely free</span>.
+              </p>
+              
+              <div className="flex flex-col sm:flex-row gap-4 mb-12">
+                <Link
+                  href="/courses"
+                  className="inline-flex items-center px-8 py-4 bg-orange-500 text-black text-lg font-bold rounded-full hover:bg-orange-400 transition-all transform hover:scale-105 group"
+                >
+                  <span>Start Learning Free</span>
+                  <FiArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </Link>
                 
-                {/* Share button for public courses */}
-                {course.isPublic && (
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      const shareUrl = `${window.location.origin}/public/courses/${course.id}`;
-                      if (navigator.share) {
-                        navigator.share({
-                          title: course.title,
-                          text: course.description,
-                          url: shareUrl
-                        });
-                      } else {
-                        navigator.clipboard.writeText(shareUrl);
-                        alert('Course URL copied to clipboard!');
-                      }
-                    }}
-                    className="absolute top-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity bg-white bg-opacity-90 hover:bg-opacity-100 text-gray-600 hover:text-blue-600 p-2 rounded-full shadow-md"
-                    title="Share this course"
+                {!user ? (
+                  <Link
+                    href="/auth/signup"
+                    className="inline-flex items-center px-8 py-4 border-2 border-white text-white text-lg font-bold rounded-full hover:bg-white hover:text-black transition-all"
                   >
-                    <FiShare2 className="w-4 h-4" />
-                  </button>
+                    Create Your List
+                  </Link>
+                ) : (
+                  <Link
+                    href="/courses/create"
+                    className="inline-flex items-center px-8 py-4 border-2 border-orange-500 text-orange-500 text-lg font-bold rounded-full hover:bg-orange-500 hover:text-black transition-all"
+                  >
+                    Create Course
+                  </Link>
                 )}
               </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Sample Categories for New Users */}
-      {!user && filteredCourses.length === 0 && courses.length === 0 && (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <h2 className="text-2xl font-semibold text-gray-900 mb-6 text-center">
-            Explore Categories
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {defaultCategories.map((category) => (
-              <div
-                key={category.id}
-                className="bg-white rounded-md border border-gray-200 shadow-sm hover:shadow-md transition-shadow cursor-pointer group"
-                onClick={() => setSelectedCategory(category.id)}
-              >
-                <div className="aspect-w-16 aspect-h-9">
-                  <img
-                    src={category.image}
-                    alt={category.name}
-                    className="w-full h-48 object-cover rounded-t-md group-hover:scale-105 transition-transform duration-200"
-                    draggable="false"
-                  />
+              
+              <div className="grid grid-cols-3 gap-6 text-center">
+                <div>
+                  <div className="text-3xl font-bold text-orange-400 mb-1">{stats.totalCourses}+</div>
+                  <div className="text-gray-400 text-sm">Courses Created</div>
                 </div>
-                <div className="p-4">
-                  <h3 className="text-lg font-semibold text-gray-900 text-center">
-                    {category.name}
-                  </h3>
+                <div>
+                  <div className="text-3xl font-bold text-orange-400 mb-1">∞</div>
+                  <div className="text-gray-400 text-sm">Always Free</div>
                 </div>
               </div>
-            ))}
-          </div>
-          <div className="text-center mt-8">
-            <p className="text-gray-600 mb-4">
-              Sign up to create and track your learning progress
-            </p>
-            <Link
-              href="/auth/signup"
-              className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-black hover:bg-gray-800"
-            >
-              Get Started
-            </Link>
+            </div>
+            
+            {/* Right Side - Animated YouTube to Premium Transformation */}
+            <div className="relative">
+              <div className="relative w-full max-w-md mx-auto">
+                {/* Container for the transformation animation */}
+                <div className="relative bg-gray-900 rounded-2xl p-6 border border-gray-800 overflow-hidden min-h-[320px]">
+                  
+                  {/* YouTube Playlist Skeleton (Always visible as base) */}
+                  <motion.div 
+                  className="absolute inset-6"
+                  animate={{ opacity: showPremium ? 0 : 1 }}
+                  transition={{ duration: 0.5 }}
+                  >
+                  <div className="flex items-center mb-4">
+                    <FiYoutube className="w-6 h-6 text-red-500 mr-3" />
+                    <span className="text-gray-400 font-medium">YouTube Playlist</span>
+                  </div>
+                  <div className="space-y-3">
+                    {/* Video 1 */}
+                    <motion.div 
+                    className="flex items-center space-x-3"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.1 }}
+                    >
+                    <div className="w-16 h-10 bg-gray-800 rounded flex items-center justify-center">
+                      <FiPlay className="w-4 h-4 text-gray-600" />
+                    </div>
+                    <div className="flex-1">
+                      <motion.div 
+                      className="h-3 bg-gray-700 rounded mb-1"
+                      animate={{ opacity: [0.5, 1, 0.5] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                      />
+                      <motion.div 
+                      className="h-2 bg-gray-800 rounded w-2/3"
+                      animate={{ opacity: [0.3, 0.7, 0.3] }}
+                      transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
+                      />
+                    </div>
+                    </motion.div>
+                    
+                    {/* Video 2 */}
+                    <motion.div 
+                    className="flex items-center space-x-3 opacity-60"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 0.6, x: 0 }}
+                    transition={{ delay: 0.2 }}
+                    >
+                    <div className="w-16 h-10 bg-gray-800 rounded flex items-center justify-center">
+                      <FiPlay className="w-4 h-4 text-gray-600" />
+                    </div>
+                    <div className="flex-1">
+                      <motion.div 
+                      className="h-3 bg-gray-700 rounded mb-1"
+                      animate={{ opacity: [0.3, 0.6, 0.3] }}
+                      transition={{ duration: 2, repeat: Infinity, delay: 0.2 }}
+                      />
+                      <motion.div 
+                      className="h-2 bg-gray-800 rounded w-1/2"
+                      animate={{ opacity: [0.2, 0.5, 0.2] }}
+                      transition={{ duration: 2, repeat: Infinity, delay: 0.7 }}
+                      />
+                    </div>
+                    </motion.div>
+                    
+                    {/* Video 3 */}
+                    <motion.div 
+                    className="flex items-center space-x-3 opacity-40"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 0.4, x: 0 }}
+                    transition={{ delay: 0.3 }}
+                    >
+                    <div className="w-16 h-10 bg-gray-800 rounded flex items-center justify-center">
+                      <FiPlay className="w-4 h-4 text-gray-600" />
+                    </div>
+                    <div className="flex-1">
+                      <motion.div 
+                      className="h-3 bg-gray-700 rounded mb-1"
+                      animate={{ opacity: [0.2, 0.4, 0.2] }}
+                      transition={{ duration: 2, repeat: Infinity, delay: 0.4 }}
+                      />
+                      <motion.div 
+                      className="h-2 bg-gray-800 rounded w-3/4"
+                      animate={{ opacity: [0.1, 0.3, 0.1] }}
+                      transition={{ duration: 2, repeat: Infinity, delay: 0.9 }}
+                      />
+                    </div>
+                    </motion.div>
+                  </div>
+                  <motion.div 
+                    className="mt-4 text-red-400 text-sm flex items-center"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.5 }}
+                  >
+                    <FiX className="w-4 h-4 mr-2" />
+                    No progress tracking
+                  </motion.div>
+                  </motion.div>
+
+                  {/* Premium Course Skeleton (Slides in from right) */}
+                  <AnimatePresence>
+                  {showPremium && (
+                    <motion.div 
+                    className="absolute inset-6"
+                    initial={{ x: "100%", opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    exit={{ x: "100%", opacity: 0 }}
+                    transition={{ 
+                      type: "spring", 
+                      stiffness: 100, 
+                      damping: 20,
+                      duration: 0.8
+                    }}
+                    >
+                    <div className="flex items-center mb-4">
+                      <motion.div
+                      initial={{ scale: 0, rotate: -180 }}
+                      animate={{ scale: 1, rotate: 0 }}
+                      transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
+                      >
+                      <FiStar className="w-6 h-6 text-orange-400 mr-3" />
+                      </motion.div>
+                      <span className="text-orange-400 font-medium">Premium Course</span>
+                    </div>
+                    <div className="space-y-3">
+                      {/* Lesson 1 - Completed */}
+                      <motion.div 
+                      className="flex items-center space-x-3"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.4 }}
+                      >
+                      <div className="relative w-16 h-10 bg-orange-500/30 rounded border border-orange-400 flex items-center justify-center">
+                        <FiPlay className="w-4 h-4 text-orange-400" />
+                        <motion.div 
+                        className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center"
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ delay: 0.6, type: "spring", stiffness: 300 }}
+                        >
+                        <FiCheckCircle className="w-3 h-3 text-white" />
+                        </motion.div>
+                      </div>
+                      <div className="flex-1">
+                        <div className="h-3 bg-orange-400 rounded mb-1"></div>
+                        <div className="h-2 bg-yellow-400 rounded w-2/3"></div>
+                      </div>
+                      <motion.div 
+                        className="w-12 h-2 bg-gray-600 rounded-full relative overflow-hidden"
+                        initial={{ width: 0 }}
+                        animate={{ width: 48 }}
+                        transition={{ delay: 0.8 }}
+                      >
+                        <motion.div 
+                        className="h-full bg-green-400 rounded-full"
+                        initial={{ width: 0 }}
+                        animate={{ width: "100%" }}
+                        transition={{ delay: 1, duration: 0.5 }}
+                        />
+                      </motion.div>
+                      </motion.div>
+                      
+                      {/* Lesson 2 - In Progress */}
+                      <motion.div 
+                      className="flex items-center space-x-3"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.5 }}
+                      >
+                      <div className="relative w-16 h-10 bg-yellow-500/30 rounded border border-yellow-400 flex items-center justify-center">
+                        <FiPlay className="w-4 h-4 text-yellow-400" />
+                        <motion.div 
+                        className="absolute -top-1 -right-1 w-4 h-4 bg-orange-500 rounded-full flex items-center justify-center"
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ delay: 0.7, type: "spring", stiffness: 300 }}
+                        >
+                        <motion.div 
+                          className="w-2 h-2 bg-white rounded-full"
+                          animate={{ scale: [1, 1.2, 1] }}
+                          transition={{ duration: 1, repeat: Infinity }}
+                        />
+                        </motion.div>
+                      </div>
+                      <div className="flex-1">
+                        <div className="h-3 bg-yellow-400 rounded mb-1"></div>
+                        <div className="h-2 bg-orange-400 rounded w-1/2"></div>
+                      </div>
+                      <motion.div 
+                        className="w-12 h-2 bg-gray-600 rounded-full relative overflow-hidden"
+                        initial={{ width: 0 }}
+                        animate={{ width: 48 }}
+                        transition={{ delay: 0.9 }}
+                      >
+                        <motion.div 
+                        className="h-full bg-yellow-400 rounded-full"
+                        initial={{ width: 0 }}
+                        animate={{ width: "50%" }}
+                        transition={{ delay: 1.1, duration: 0.5 }}
+                        />
+                      </motion.div>
+                      </motion.div>
+                      
+                      {/* Lesson 3 - Upcoming */}
+                      <motion.div 
+                      className="flex items-center space-x-3 opacity-60"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 0.6, y: 0 }}
+                      transition={{ delay: 0.6 }}
+                      >
+                      <div className="w-16 h-10 bg-gray-700 rounded border border-gray-600 flex items-center justify-center">
+                        <FiPlay className="w-4 h-4 text-gray-500" />
+                      </div>
+                      <div className="flex-1">
+                        <div className="h-3 bg-gray-600 rounded mb-1"></div>
+                        <div className="h-2 bg-gray-700 rounded w-3/4"></div>
+                      </div>
+                      <div className="w-12 bg-gray-600 h-2 rounded-full"></div>
+                      </motion.div>
+                    </div>
+                    <motion.div 
+                      className="mt-4 text-green-400 text-sm flex items-center"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 1.2 }}
+                    >
+                      <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ delay: 1.3, type: "spring", stiffness: 300 }}
+                      >
+                      <FiCheckCircle className="w-4 h-4 mr-2" />
+                      </motion.div>
+                      Progress tracked & structured
+                    </motion.div>
+                    </motion.div>
+                  )}
+                  </AnimatePresence>
+
+                  {/* Diagonal Line Effect */}
+                  <AnimatePresence>
+                  {showPremium && (
+                    <motion.div
+                    className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-orange-400 via-yellow-400 to-orange-500 transform origin-top-left rotate-45"
+                    initial={{ scaleY: 0 }}
+                    animate={{ scaleY: 1 }}
+                    exit={{ scaleY: 0 }}
+                    transition={{ 
+                      duration: 0.6, 
+                      ease: "easeInOut",
+                      delay: 0.2
+                    }}
+                    style={{
+                      height: "141%", // ~1.414 * 100% to cover diagonal
+                      left: "-1px",
+                      top: "-20%"
+                    }}
+                    />
+                  )}
+                  </AnimatePresence>
+                </div>
+
+                {/* Text below the animation */}
+                <motion.div 
+                  className="text-center mt-6"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.8 }}
+                >
+                  <motion.p 
+                    className="text-xl font-bold text-orange-400 mb-2"
+                    animate={{ 
+                      scale: showPremium ? 1.05 : 1,
+                      color: showPremium ? "#fb923c" : "#f97316"
+                    }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    Transform Your Learning
+                  </motion.p>
+                  <p className="text-gray-300">
+                    Convert <span className="text-red-500">YouTube Playlists</span> to <span className="text-orange-400">Premium Courses</span>
+                  </p>
+                </motion.div>
+              </div>
+            </div>
           </div>
         </div>
-      )}
+      </section>
+<DemoVideo/>
+      {/* Why This Special Section */}
+    <Advantages/>
+
+      {/* FAQ Section */}
+     <FAQ openFaq={openFaq} setOpenFaq={setOpenFaq}/>
+
+
+      {/* CTA Section */}
+   <CTA user={user}/>
+
+      {/* Footer */}
+ <Footer user={user}/>
     </div>
   );
 }

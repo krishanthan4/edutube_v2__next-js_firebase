@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { HiMenu, HiX } from 'react-icons/hi';
+import { HiMenu, HiX, HiUser, HiCog } from 'react-icons/hi';
 
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -26,45 +26,45 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="bg-white border-b border-gray-200 shadow-sm">
+    <nav className="bg-white  shadow-sm sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div className="flex-shrink-0">
-            <Link href="/" className="text-2xl font-bold text-gray-900">
-              EduTube
+            <Link href="/" className="text-2xl font-bold text-black">
+              Edutube
             </Link>
           </div>
 
           {/* Desktop Navigation */}
           <div className="hidden md:block">
-            <div className="ml-10 flex items-baseline space-x-4">
+            <div className="flex items-center space-x-1">
               <Link
                 href="/"
-                className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 border border-gray-300"
+                className="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200"
               >
-                Home
+                Courses
               </Link>
               {user && (
                 <>
                   <Link
                     href="/courses/create"
-                    className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 border border-gray-300"
+                    className="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200"
                   >
                     Create Course
                   </Link>
                   <Link
                     href="/categories/manage"
-                    className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 border border-gray-300"
+                    className="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200"
                   >
-                    Manage Categories
+                    Categories
                   </Link>
                   {isAdmin && isAdmin() && (
                     <Link
                       href="/admin"
-                      className="px-3 py-2 rounded-md text-sm font-medium text-white bg-red-600 hover:bg-red-700 border border-red-600"
+                    className="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200"
                     >
-                      Admin Panel
+                      Admin
                     </Link>
                   )}
                 </>
@@ -74,44 +74,55 @@ export default function Navbar() {
 
           {/* User Menu */}
           <div className="hidden md:block">
-            <div className="ml-4 flex items-center md:ml-6">
+            <div className="flex items-center space-x-3">
               {user ? (
-                <div className="flex items-center space-x-4">
-                  <Link
-                    href="/profile"
-                    className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100"
-                    title="My Profile"
-                  >
-                    Profile
-                  </Link>
-                  <Link
-                    href="/settings"
-                    className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100"
-                    title="Account Settings"
-                  >
-                    Settings
-                  </Link>
-                  <span className="text-sm text-gray-700">
-                    {user.email}
-                  </span>
-                  <button
-                    onClick={handleLogout}
-                    className="px-3 py-2 rounded-md text-sm font-medium text-white bg-black hover:bg-gray-800"
-                  >
-                    Logout
-                  </button>
+                <div className="flex items-center space-x-3">
+                  <div className="flex items-center space-x-1">
+                    <Link
+                      href="/profile"
+                      className="p-2 rounded-lg text-gray-600 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200"
+                      title="Profile"
+                    >
+                      <HiUser className="h-5 w-5" />
+                    </Link>
+                    <Link
+                      href="/settings"
+                      className="p-2 rounded-lg text-gray-600 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200"
+                      title="Settings"
+                    >
+                      <HiCog className="h-5 w-5" />
+                    </Link>
+                  </div>
+                  <div className="flex items-center space-x-3 pl-3 border-l border-gray-200">
+                    <div className="flex items-center space-x-2">
+                      <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
+                        <span className="text-white text-sm font-medium">
+                          {user.email?.charAt(0).toUpperCase()}
+                        </span>
+                      </div>
+                      <span className="text-sm text-gray-700 font-medium max-w-32 truncate">
+                        {user.email}
+                      </span>
+                    </div>
+                    <button
+                      onClick={handleLogout}
+                      className="px-4 py-2 rounded-lg text-sm font-medium text-white bg-gray-800 hover:bg-gray-900 transition-all duration-200 shadow-sm"
+                    >
+                      Logout
+                    </button>
+                  </div>
                 </div>
               ) : (
-                <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-2">
                   <Link
                     href="/auth/login"
-                    className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900"
+                    className="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200"
                   >
                     Login
                   </Link>
                   <Link
                     href="/auth/signup"
-                    className="px-3 py-2 rounded-md text-sm font-medium text-white bg-black hover:bg-gray-800"
+                    className="px-4 py-2 rounded-lg text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-sm transition-all duration-200"
                   >
                     Sign Up
                   </Link>
@@ -124,12 +135,12 @@ export default function Navbar() {
           <div className="md:hidden">
             <button
               onClick={toggleMobileMenu}
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-black"
+              className="p-2 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-all duration-200"
             >
               {isMobileMenuOpen ? (
-                <HiX className="block h-6 w-6" />
+                <HiX className="h-6 w-6" />
               ) : (
-                <HiMenu className="block h-6 w-6" />
+                <HiMenu className="h-6 w-6" />
               )}
             </button>
           </div>
@@ -138,41 +149,41 @@ export default function Navbar() {
 
       {/* Mobile menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden">
-          <div className="px-2 pt-2 pb-3 space-y-1 bg-gray-50 border-t border-gray-200">
+        <div className="md:hidden bg-white/95 backdrop-blur-md border-t border-gray-200/50">
+          <div className="px-4 pt-2 pb-3 space-y-1">
             <Link
               href="/"
-              className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100"
+              className="block px-4 py-3 rounded-lg text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200"
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              Home
+              Courses
             </Link>
             {user && (
               <>
                 <Link
                   href="/courses/create"
-                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100"
+                  className="block px-4 py-3 rounded-lg text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   Create Course
                 </Link>
                 <Link
                   href="/categories/manage"
-                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100"
+                  className="block px-4 py-3 rounded-lg text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
-                  Manage Categories
+                  Categories
                 </Link>
                 <Link
                   href="/profile"
-                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100"
+                  className="block px-4 py-3 rounded-lg text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   Profile
                 </Link>
                 <Link
                   href="/settings"
-                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100"
+                  className="block px-4 py-3 rounded-lg text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   Settings
@@ -180,7 +191,7 @@ export default function Navbar() {
                 {isAdmin && isAdmin() && (
                   <Link
                     href="/admin"
-                    className="block px-3 py-2 rounded-md text-base font-medium text-white bg-red-600 hover:bg-red-700"
+                    className="block px-4 py-3 rounded-lg text-base font-medium text-white bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 transition-all duration-200"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     Admin Panel
@@ -189,34 +200,41 @@ export default function Navbar() {
               </>
             )}
             {user ? (
-              <div className="pt-4 pb-3 border-t border-gray-200">
-                <div className="px-3">
-                  <div className="text-sm text-gray-500">{user.email}</div>
+              <div className="pt-4 border-t border-gray-200/50">
+                <div className="px-4 pb-3">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
+                      <span className="text-white font-medium">
+                        {user.email?.charAt(0).toUpperCase()}
+                      </span>
+                    </div>
+                    <div className="text-sm text-gray-700 font-medium">
+                      {user.email}
+                    </div>
+                  </div>
                 </div>
-                <div className="mt-3 px-2">
-                  <button
-                    onClick={() => {
-                      handleLogout();
-                      setIsMobileMenuOpen(false);
-                    }}
-                    className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100"
-                  >
-                    Logout
-                  </button>
-                </div>
+                <button
+                  onClick={() => {
+                    handleLogout();
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="w-full mx-4 mb-2 px-4 py-3 rounded-lg text-base font-medium text-white bg-gray-800 hover:bg-gray-900 transition-all duration-200"
+                >
+                  Logout
+                </button>
               </div>
             ) : (
-              <div className="pt-4 pb-3 border-t border-gray-200 space-y-1">
+              <div className="pt-4 border-t border-gray-200/50 space-y-2">
                 <Link
                   href="/auth/login"
-                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100"
+                  className="block mx-4 px-4 py-3 rounded-lg text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   Login
                 </Link>
                 <Link
                   href="/auth/signup"
-                  className="block px-3 py-2 rounded-md text-base font-medium text-white bg-black hover:bg-gray-800"
+                  className="block mx-4 mb-2 px-4 py-3 rounded-lg text-base font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 transition-all duration-200"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   Sign Up

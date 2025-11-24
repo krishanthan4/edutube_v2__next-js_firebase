@@ -62,13 +62,26 @@ export default function CourseViewer({ params }: CourseViewerProps) {
   };
 
   const handleCompleteVideo = async () => {
-    if (!user || !course || !course.videos) return;
+    console.log('Complete button clicked');
+    console.log('User:', user);
+    console.log('Course:', course);
+    console.log('Current video index:', currentVideoIndex);
+    
+    if (!user || !course || !course.videos) {
+      console.log('Missing required data:', { user: !!user, course: !!course, videos: !!course?.videos });
+      return;
+    }
     
     const currentVideo = course.videos[currentVideoIndex];
-    if (!currentVideo || isVideoCompleted(currentVideo.id)) return;
+    if (!currentVideo || isVideoCompleted(currentVideo.id)) {
+      console.log('Video already completed or not found:', { currentVideo: !!currentVideo, completed: isVideoCompleted(currentVideo?.id || '') });
+      return;
+    }
 
     try {
+      console.log('Creating user progress for video:', currentVideo.id);
       await createUserProgress(user.uid, resolvedParams.courseId, currentVideo.id);
+      console.log('User progress created successfully');
       
       // Update local state
       const newProgress: UserProgress = {
@@ -80,13 +93,16 @@ export default function CourseViewer({ params }: CourseViewerProps) {
         completedAt: new Date()
       };
       setUserProgress([...userProgress, newProgress]);
+      console.log('Local progress updated');
       
       // Auto-advance to next video if not last
       if (currentVideoIndex < course.videos.length - 1) {
         setCurrentVideoIndex(currentVideoIndex + 1);
+        console.log('Advanced to next video');
       }
     } catch (error) {
       console.error('Error marking video as complete:', error);
+      alert('Failed to mark video as complete. Please try again.');
     }
   };
 
@@ -257,11 +273,19 @@ export default function CourseViewer({ params }: CourseViewerProps) {
         </div>
 
         {/* Bottom Complete Button */}
-        <div className="flex flex-row justify-center w-full py-2">
+        <div className="flex flex-col items-center w-full py-4">
           <button
-            onClick={handleCompleteVideo}
+            onClick={(e) => {
+              e.preventDefault();
+              console.log('Button click event triggered');
+              handleCompleteVideo();
+            }}
             disabled={!user || isVideoCompleted(currentVideo.id)}
-            className="py-2 px-3 rounded-lg bg-black text-white hover:bg-gray-900 disabled:opacity-50"
+            className={`py-3 px-6 rounded-lg font-medium transition-colors ${
+              !user || isVideoCompleted(currentVideo.id)
+                ? 'bg-gray-400 text-gray-200 cursor-not-allowed opacity-50'
+                : 'bg-black text-white hover:bg-gray-800 cursor-pointer'
+            }`}
           >
             {isVideoCompleted(currentVideo.id) 
               ? 'Completed ✓' 

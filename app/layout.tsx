@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "EduTube",
+  title: "Edutube",
   description: "Watch YouTube Playlists Like Premium Courses",
 };
 
