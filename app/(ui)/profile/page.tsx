@@ -1,12 +1,12 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { useAuth } from '../../../contexts/AuthContext';
+import { useAuth } from '@/app/contexts/AuthContext';
 import { collection, query, where, getDocs, orderBy, limit } from 'firebase/firestore';
-import { db } from '../../../lib/firebase';
-import { Course, User, UserProgress } from '../../../types';
-import Navbar from '../../components/Navbar';
-import ProtectedRoute from '../../components/ProtectedRoute';
-import ActivityCalendar from '../../components/ActivityCalendar';
+import { db } from '@/app/lib/firebase';
+import { Course, User, UserProgress } from '@/app/types';
+import Navbar from '@/app/components/Navbar';
+import ProtectedRoute from '@/app/components/ProtectedRoute';
+import ActivityCalendar from '@/app/components/ActivityCalendar';
 import Link from 'next/link';
 import { 
   FiUser, 

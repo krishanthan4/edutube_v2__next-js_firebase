@@ -1,13 +1,13 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { useAuth } from '../../../contexts/AuthContext';
+import { useAuth } from '@/app/contexts/AuthContext';
 import { updateProfile } from 'firebase/auth';
 import { doc, updateDoc } from 'firebase/firestore';
-import { db } from '../../../lib/firebase';
-import { uploadImageToPublic, validateImageFile } from '../../../lib/imageUpload';
-import { User } from '../../../types';
-import Navbar from '../../components/Navbar';
-import ProtectedRoute from '../../components/ProtectedRoute';
+import { db } from '@/app/lib/firebase';
+import { uploadImageToPublic, validateImageFile } from '@/app/lib/imageUpload';
+import { User } from '@/app/types';
+import Navbar from '@/app/components/Navbar';
+import ProtectedRoute from '@/app/components/ProtectedRoute';
 import { 
   FiUser, 
   FiMail, 

@@ -1,8 +1,8 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { useAuth } from '../contexts/AuthContext';
-import { getCourses } from '../lib/firestore';
-import { Course } from '../types';
+import { useAuth } from '@/app/contexts/AuthContext';
+import { getCourses } from '@/app/lib/firestore';
+import { Course } from '@/app/types';
 import Navbar from './components/Navbar';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';

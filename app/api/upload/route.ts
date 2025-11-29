@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { writeFile, mkdir } from 'fs/promises';
 import { existsSync } from 'fs';
 import path from 'path';
-import { generateUniqueFilename, validateImageFile } from '../../../lib/imageUpload';
+import { generateUniqueFilename, validateImageFile } from '@/app/lib/imageUpload';
 
 export async function POST(request: NextRequest) {
   try {

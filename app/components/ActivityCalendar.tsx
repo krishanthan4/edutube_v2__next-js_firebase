@@ -1,8 +1,8 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { collection, query, where, getDocs, orderBy, limit } from 'firebase/firestore';
-import { db } from '../../lib/firebase';
-import { DailyActivity, UserStats } from '../../types';
+import { db } from '@/app/lib/firebase';
+import { DailyActivity, UserStats } from '@/app/types';
 import { 
   FiZap, 
   FiTrendingUp, 
