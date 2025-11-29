@@ -42,27 +42,44 @@ export default function ActivityCalendar({ userId, className = '' }: ActivityCal
       const oneYearAgo = new Date();
       oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
       
-      const activitiesQuery = query(
-        collection(db, 'dailyActivities'),
-        where('userId', '==', userId),
-        where('date', '>=', formatDate(oneYearAgo)),
-        orderBy('date', 'desc'),
-        limit(365)
-      );
+      // Query activities with proper error handling
+      let activitiesData: DailyActivity[] = [];
+      let statsData: UserStats | null = null;
 
-      const [activitiesSnapshot, statsSnapshot] = await Promise.all([
-        getDocs(activitiesQuery),
-        getDocs(query(collection(db, 'userStats'), where('userId', '==', userId), limit(1)))
-      ]);
+      try {
+        const activitiesQuery = query(
+          collection(db, 'dailyActivities'),
+          where('userId', '==', userId),
+          where('date', '>=', formatDate(oneYearAgo)),
+          orderBy('date', 'desc'),
+          limit(365)
+        );
+        
+        const activitiesSnapshot = await getDocs(activitiesQuery);
+        activitiesData = activitiesSnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        })) as DailyActivity[];
+      } catch (error) {
+        console.warn('Could not fetch daily activities:', error);
+        activitiesData = [];
+      }
 
-      const activitiesData = activitiesSnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      })) as DailyActivity[];
-
-      const statsData = statsSnapshot.docs.length > 0 ? 
-        { ...statsSnapshot.docs[0].data() } as UserStats : 
-        null;
+      try {
+        const statsQuery = query(
+          collection(db, 'userStats'),
+          where('userId', '==', userId),
+          limit(1)
+        );
+        
+        const statsSnapshot = await getDocs(statsQuery);
+        statsData = statsSnapshot.docs.length > 0 ? 
+          { ...statsSnapshot.docs[0].data() } as UserStats : 
+          null;
+      } catch (error) {
+        console.warn('Could not fetch user stats:', error);
+        statsData = null;
+      }
 
       setActivities(activitiesData);
       setStats(statsData);
@@ -187,6 +204,21 @@ export default function ActivityCalendar({ userId, className = '' }: ActivityCal
               <div key={i} className="w-3 h-3 bg-gray-200 rounded"></div>
             ))}
           </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show empty state if no data could be fetched
+  if (activities.length === 0 && !stats) {
+    return (
+      <div className={`bg-white rounded-lg shadow-sm border border-gray-200 p-6 ${className}`}>
+        <div className="text-center py-8">
+          <FiActivity className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-gray-900 mb-2">No Activity Data Yet</h3>
+          <p className="text-gray-600">
+            Start learning and completing courses to see your activity calendar!
+          </p>
         </div>
       </div>
     );

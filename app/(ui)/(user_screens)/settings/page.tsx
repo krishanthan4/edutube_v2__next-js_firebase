@@ -122,7 +122,6 @@ export default function Settings() {
   if (!user || !userProfile) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <Navbar />
         <div className="flex items-center justify-center h-96">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
@@ -136,7 +135,6 @@ export default function Settings() {
   return (
     <ProtectedRoute>
       <div className="min-h-screen bg-gray-50">
-        <Navbar />
         <div className="max-w-4xl mx-auto px-4 py-8">
           <div className="bg-white rounded-lg shadow-sm border border-gray-200">
             {/* Header */}
@@ -181,9 +179,6 @@ export default function Settings() {
                     <div>
                       <h3 className="font-medium text-gray-900">{displayName || user.displayName || 'No Name'}</h3>
                       <p className="text-sm text-gray-600">{user.email}</p>
-                      <p className="text-xs text-gray-500 mt-1">
-                        Role: <span className="capitalize">{userProfile.role}</span>
-                      </p>
                     </div>
                   </div>
 
@@ -237,7 +232,7 @@ export default function Settings() {
               </section>
 
               {/* Privacy Settings */}
-              <section className="border-t border-gray-200 pt-8">
+              <section className="hidden border-t border-gray-200 pt-8">
                 <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                   <FiShield className="mr-2" />
                   Privacy & Notifications
@@ -279,7 +274,7 @@ export default function Settings() {
               </section>
 
               {/* Account Stats */}
-              <section className="border-t border-gray-200 pt-8">
+              <section className="hidden border-t border-gray-200 pt-8">
                 <h2 className="text-lg font-semibold text-gray-900 mb-4">Account Information</h2>
                 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

@@ -73,7 +73,8 @@ export default function Home() {
       <Navbar />
       
       {/* Hero Section - YouTube to Premium Courses */}
-  <Hero showPremium={showPremium} stats={stats} user={user}/>
+  <Hero stats={stats} user={user}/>
+    {/* <Hero /> */}
 <DemoVideo/>
       {/* Why This Special Section */}
     <Advantages/>

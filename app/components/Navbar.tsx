@@ -4,6 +4,7 @@ import { useAuth } from '@/app/contexts/AuthContext';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { HiMenu, HiX, HiUser, HiCog } from 'react-icons/hi';
+import { Menu, MenuButton, MenuItems, MenuItem } from '@headlessui/react';
 
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -45,14 +46,14 @@ export default function Navbar() {
               >
                 Courses
               </Link>
+                    {user && (<Link
+                href="/courses/create"
+                className="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 hover:text-black hover:bg-black/5 transition-all duration-200"
+              >
+                Create Course
+              </Link>)}
    {isAdmin && isAdmin() && (                <>
-                  <Link
-                    href="/courses/create"
-                    className="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 hover:text-black hover:bg-black/5 transition-all duration-200"
-                  >
-                    Create Course
-                  </Link>
-                  <Link
+                                   <Link
                     href="/categories/manage"
                     className="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 hover:text-black hover:bg-black/5 transition-all duration-200"
                   >
@@ -74,44 +75,7 @@ export default function Navbar() {
           {/* User Menu */}
           <div className="hidden md:block">
             <div className="flex items-center space-x-3">
-              {user ? (
-                <div className="flex items-center space-x-3">
-                  <div className="flex items-center space-x-1">
-                    <Link
-                      href="/profile"
-                      className="p-2 rounded-lg text-gray-600 hover:text-black hover:bg-black/5 transition-all duration-200"
-                      title="Profile"
-                    >
-                      <HiUser className="h-5 w-5" />
-                    </Link>
-                    <Link
-                      href="/settings"
-                      className="p-2 rounded-lg text-gray-600 hover:text-black hover:bg-black/5 transition-all duration-200"
-                      title="Settings"
-                    >
-                      <HiCog className="h-5 w-5" />
-                    </Link>
-                  </div>
-                  <div className="flex items-center space-x-3 pl-3 border-l border-gray-200">
-                    <div className="flex items-center space-x-2">
-                      <div className="w-8 h-8 bg-black rounded-full flex items-center justify-center">
-                        <span className="text-white text-sm font-medium">
-                          {user.email?.charAt(0).toUpperCase()}
-                        </span>
-                      </div>
-                      <span className="text-sm text-gray-700 font-medium max-w-32 truncate">
-                        {user.email}
-                      </span>
-                    </div>
-                    <button
-                      onClick={handleLogout}
-                      className="px-4 py-2 rounded-lg text-sm font-medium text-white bg-gray-800 hover:bg-gray-900 transition-all duration-200 shadow-sm"
-                    >
-                      Logout
-                    </button>
-                  </div>
-                </div>
-              ) : (
+              {user ? <></> : (
                 <div className="flex items-center space-x-2">
                   <Link
                     href="/auth/login"
@@ -129,6 +93,57 @@ export default function Navbar() {
               )}
             </div>
           </div>
+          {user && (
+            <div className="flex items-center space-x-2">
+              {/* Profile dropdown */}
+              <Menu as="div" className="relative ml-3">
+                <MenuButton className="relative flex rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">
+                  <span className="absolute -inset-1.5" />
+                  <span className="sr-only">Open user menu</span>
+                  <div className="size-8 rounded-full bg-gray-800 flex items-center justify-center outline -outline-offset-1 outline-white/10">
+                    <span className="text-white text-sm font-medium">
+                      {user.email?.charAt(0).toUpperCase()}
+                    </span>
+                  </div>
+                </MenuButton>
+                <MenuItems
+                  transition
+                  className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-sm shadow-gray-500 transition data-closed:scale-95 data-closed:transform data-closed:opacity-0 data-enter:duration-100 data-enter:ease-out data-leave:duration-75 data-leave:ease-in"
+                >
+                  <MenuItem>
+                    {({ active }) => (
+                      <Link
+                        href="/profile"
+                        className={`block px-4 py-2 text-sm text-gray-800 ${active ? 'bg-gray-50' : ''} focus:outline-none`}
+                      >
+                        Profile
+                      </Link>
+                    )}
+                  </MenuItem>
+                  <MenuItem>
+                    {({ active }) => (
+                      <Link
+                        href="/settings"
+                        className={`block px-4 py-2 text-sm text-gray-800 ${active ? 'bg-gray-50' : ''} focus:outline-none`}
+                      >
+                        Settings
+                      </Link>
+                    )}
+                  </MenuItem>
+                  <MenuItem>
+                    {({ active }) => (
+                      <button
+                        onClick={handleLogout}
+                        className={`block w-full text-left px-4 py-2 text-sm text-gray-800 ${active ? 'bg-gray-50' : ''} focus:outline-none`}
+                      >
+                        Logout
+                      </button>
+                    )}
+                  </MenuItem>
+                </MenuItems>
+              </Menu>
+            </div>
+          )}
 
           {/* Mobile menu button */}
           <div className="md:hidden">

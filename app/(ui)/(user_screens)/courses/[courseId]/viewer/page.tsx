@@ -126,8 +126,7 @@ export default function CourseViewer({ params }: CourseViewerProps) {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-100">
-        <Navbar />
+      <div className="min-h-screen bg-gray-50">
         <div className="flex items-center justify-center h-96">
           <div className="text-xl text-gray-600">Loading course...</div>
         </div>
@@ -137,8 +136,7 @@ export default function CourseViewer({ params }: CourseViewerProps) {
 
   if (error || !course) {
     return (
-      <div className="min-h-screen bg-gray-100">
-        <Navbar />
+      <div className="min-h-screen bg-gray-50">
         <div className="flex items-center justify-center h-96">
           <div className="text-center">
             <div className="text-xl text-red-600 mb-4">{error || 'Course not found'}</div>
@@ -156,7 +154,7 @@ export default function CourseViewer({ params }: CourseViewerProps) {
 
   if (!course.videos || course.videos.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-100">
+      <div className="min-h-screen bg-gray-50">
         <Navbar />
         <div className="flex items-center justify-center h-96">
           <div className="text-center">

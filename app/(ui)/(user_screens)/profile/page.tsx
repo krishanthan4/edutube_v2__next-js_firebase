@@ -27,10 +27,7 @@ import {
 interface ProfileStats {
   totalCourses: number;
   completedCourses: number;
-  totalWatchTime: number;
   currentStreak: number;
-  totalGuidances: number;
-  createdCourses: number;
 }
 
 export default function Profile() {
@@ -38,10 +35,7 @@ export default function Profile() {
   const [stats, setStats] = useState<ProfileStats>({
     totalCourses: 0,
     completedCourses: 0,
-    totalWatchTime: 0,
     currentStreak: 0,
-    totalGuidances: 0,
-    createdCourses: 0
   });
   const [recentCourses, setRecentCourses] = useState<Course[]>([]);
   const [createdCourses, setCreatedCourses] = useState<Course[]>([]);
@@ -98,17 +92,12 @@ export default function Profile() {
       }
 
       // Calculate stats
-      const totalCreatedCourses = createdCoursesSnapshot.size;
       const completedCourses = progressData.filter(p => p.completed).length;
-      const totalWatchTime = progressData.reduce((total, p) => total + (p.totalWatchTime || 0), 0);
 
       setStats({
         totalCourses: progressData.length,
         completedCourses,
-        totalWatchTime,
         currentStreak: userProfile?.currentStreak || 0,
-        totalGuidances: userProfile?.completedGuidances || 0,
-        createdCourses: totalCreatedCourses
       });
 
       setRecentCourses(recentCoursesData.slice(0, 6));
@@ -147,7 +136,6 @@ export default function Profile() {
   return (
     <ProtectedRoute>
       <div className="min-h-screen bg-gray-50">
-        <Navbar />
         <div className="max-w-7xl mx-auto px-4 py-8">
           {/* Profile Header */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
@@ -204,7 +192,7 @@ export default function Profile() {
           </div>
 
           {/* Stats Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+          <div className="grid grid-cols-2 md:grid-cols-3  gap-4 mb-8">
             <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
               <div className="flex items-center justify-between">
                 <div>
@@ -228,16 +216,6 @@ export default function Profile() {
             <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Watch Time</p>
-                  <p className="text-2xl font-bold text-purple-600">{formatWatchTime(stats.totalWatchTime)}</p>
-                </div>
-                <FiClock className="w-8 h-8 text-purple-600" />
-              </div>
-            </div>
-
-            <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-              <div className="flex items-center justify-between">
-                <div>
                   <p className="text-sm font-medium text-gray-600">Current Streak</p>
                   <p className="text-2xl font-bold text-orange-600">{stats.currentStreak}</p>
                 </div>
@@ -245,169 +223,12 @@ export default function Profile() {
               </div>
             </div>
 
-            <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Guidances</p>
-                  <p className="text-2xl font-bold text-indigo-600">{stats.totalGuidances}</p>
-                </div>
-                <FiTarget className="w-8 h-8 text-indigo-600" />
-              </div>
-            </div>
-
-            <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Created Courses</p>
-                  <p className="text-2xl font-bold text-red-600">{stats.createdCourses}</p>
-                </div>
-                <FiAward className="w-8 h-8 text-red-600" />
-              </div>
-            </div>
+           
           </div>
 
           {/* Activity Calendar */}
           <ActivityCalendar userId={user.uid} className="mb-8" />
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Recent Learning */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-              <div className="p-6 border-b border-gray-200">
-                <h2 className="text-lg font-semibold text-gray-900 flex items-center">
-                  <FiTrendingUp className="mr-2" />
-                  Recent Learning
-                </h2>
-              </div>
-              <div className="p-6">
-                {isLoading ? (
-                  <div className="space-y-4">
-                    {[...Array(3)].map((_, i) => (
-                      <div key={i} className="animate-pulse">
-                        <div className="flex space-x-3">
-                          <div className="w-16 h-12 bg-gray-200 rounded"></div>
-                          <div className="flex-1 space-y-2">
-                            <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                            <div className="h-3 bg-gray-200 rounded w-1/2"></div>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : recentCourses.length > 0 ? (
-                  <div className="space-y-4">
-                    {recentCourses.map((course) => (
-                      <Link
-                        key={course.id}
-                        href={`/courses/${course.id}/viewer`}
-                        className="block group hover:bg-gray-50 p-3 rounded-md transition-colors"
-                      >
-                        <div className="flex items-center space-x-3">
-                          <img
-                            src={course.thumbnail || '/api/placeholder/64/48'}
-                            alt={course.title}
-                            className="w-16 h-12 object-cover rounded"
-                          />
-                          <div className="flex-1 min-w-0">
-                            <h3 className="text-sm font-medium text-gray-900 group-hover:text-blue-600 truncate">
-                              {course.title}
-                            </h3>
-                            <p className="text-xs text-gray-500 mt-1">
-                              {course.videoCount || 0} lessons
-                            </p>
-                          </div>
-                          <FiPlay className="w-4 h-4 text-gray-400 group-hover:text-blue-600" />
-                        </div>
-                      </Link>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-8">
-                    <FiBookOpen className="mx-auto h-12 w-12 text-gray-400" />
-                    <h3 className="mt-2 text-sm font-medium text-gray-900">No courses yet</h3>
-                    <p className="mt-1 text-sm text-gray-500">Start learning by exploring available courses.</p>
-                    <Link
-                      href="/"
-                      className="mt-3 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
-                    >
-                      Explore Courses
-                    </Link>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Created Courses */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-              <div className="p-6 border-b border-gray-200">
-                <h2 className="text-lg font-semibold text-gray-900 flex items-center">
-                  <FiAward className="mr-2" />
-                  My Courses
-                </h2>
-              </div>
-              <div className="p-6">
-                {isLoading ? (
-                  <div className="space-y-4">
-                    {[...Array(3)].map((_, i) => (
-                      <div key={i} className="animate-pulse">
-                        <div className="flex space-x-3">
-                          <div className="w-16 h-12 bg-gray-200 rounded"></div>
-                          <div className="flex-1 space-y-2">
-                            <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                            <div className="h-3 bg-gray-200 rounded w-1/2"></div>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : createdCourses.length > 0 ? (
-                  <div className="space-y-4">
-                    {createdCourses.map((course) => (
-                      <div
-                        key={course.id}
-                        className="group hover:bg-gray-50 p-3 rounded-md transition-colors"
-                      >
-                        <div className="flex items-center space-x-3">
-                          <img
-                            src={course.thumbnail || '/api/placeholder/64/48'}
-                            alt={course.title}
-                            className="w-16 h-12 object-cover rounded"
-                          />
-                          <div className="flex-1 min-w-0">
-                            <h3 className="text-sm font-medium text-gray-900 truncate">
-                              {course.title}
-                            </h3>
-                            <div className="flex items-center space-x-4 text-xs text-gray-500 mt-1">
-                              <span>{course.videoCount || 0} lessons</span>
-                              <span>{course.isPublic ? 'Public' : 'Private'}</span>
-                              <span>{new Date(course.createdAt?.toDate() || 0).toLocaleDateString()}</span>
-                            </div>
-                          </div>
-                          <Link
-                            href={`/courses/${course.id}/edit`}
-                            className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-blue-600 transition-all"
-                          >
-                            <FiEdit3 className="w-4 h-4" />
-                          </Link>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-8">
-                    <FiAward className="mx-auto h-12 w-12 text-gray-400" />
-                    <h3 className="mt-2 text-sm font-medium text-gray-900">No courses created</h3>
-                    <p className="mt-1 text-sm text-gray-500">Share your knowledge by creating a course.</p>
-                    <Link
-                      href="/courses/create"
-                      className="mt-3 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
-                    >
-                      Create Course
-                    </Link>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </ProtectedRoute>

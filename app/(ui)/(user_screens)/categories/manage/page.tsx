@@ -83,7 +83,7 @@ export default function ManageCategories() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gray-100">
+      <div className="min-h-screen bg-gray-50">
         <Navbar />
         <div className="flex items-center justify-center h-96">
           <div className="text-xl text-gray-600">Please log in to manage categories</div>
@@ -93,9 +93,7 @@ export default function ManageCategories() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <Navbar />
-      
+    <div className="min-h-screen bg-gray-50">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-white rounded-lg shadow-md p-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-8">Manage Categories</h1>
