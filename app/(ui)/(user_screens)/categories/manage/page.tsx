@@ -181,12 +181,12 @@ export default function ManageCategories() {
                         )}
                       </div>
                       {/* Note: Delete functionality would be implemented here */}
-                      {/* <button
+                      <button
                         className="ml-2 p-1 text-gray-400 hover:text-red-600"
                         title="Delete category"
                       >
                         <HiTrash className="h-4 w-4" />
-                      </button> */}
+                      </button>
                     </div>
                     
                     <div className="mt-3 text-xs text-gray-500">

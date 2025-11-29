@@ -33,7 +33,7 @@ export default function Signup() {
       setError('');
       setLoading(true);
       await signup(email, password);
-      router.push('/');
+      router.push('/courses/');
     } catch (error) {
       setError('Failed to create an account. This email may already be in use.');
       console.error(error);
@@ -47,7 +47,7 @@ export default function Signup() {
       setError('');
       setLoading(true);
       await signInWithGoogle();
-      router.push('/');
+      router.push('/courses/');
     } catch (error) {
       setError('Failed to sign in with Google');
       console.error(error);
@@ -57,7 +57,7 @@ export default function Signup() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+    <div className="h-[90vh] flex items-center justify-center">
       <div className="max-w-md w-full bg-white p-8 rounded-lg shadow-md">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Edutube</h1>

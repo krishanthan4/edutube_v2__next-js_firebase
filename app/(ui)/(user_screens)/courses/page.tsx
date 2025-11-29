@@ -27,15 +27,6 @@ export default function CoursesPage() {
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
 
-  // Default categories if none exist in Firestore
-  const defaultCategories: Category[] = [
-    { id: 'web-dev', name: 'Web Development', image: 'https://img.freepik.com/premium-photo/conceptual-image-laptop-with-fire-screengenerative-ai_391052-12821.jpg' },
-    { id: 'cybersecurity', name: 'Cybersecurity', image: 'https://akm-img-a-in.tosshub.com/sites/visualstory/stories/2023_03/story_26409/assets/1.jpeg?time=1678872838&size=*:900' },
-    { id: 'mobile-dev', name: 'Mobile Development', image: 'https://techrushi.com/wp-content/uploads/2023/01/Ai-Art-Generator-Wallpapers.jpg' },
-    { id: 'computer-science', name: 'Computer Science', image: 'https://images.unsplash.com/photo-1555949963-aa79dcee981c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80' },
-    { id: 'backend', name: 'Backend Development', image: 'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80' },
-    { id: 'frontend', name: 'Frontend Development', image: 'https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80' }
-  ];
 
   useEffect(() => {
     const fetchData = async () => {
@@ -44,16 +35,15 @@ export default function CoursesPage() {
         
         // Fetch categories
         const fetchedCategories = await getCategories();
-        const categoriesToUse = fetchedCategories.length > 0 ? fetchedCategories : defaultCategories;
-        setCategories(categoriesToUse as Category[]);
+        if(fetchedCategories.length > 0){
+        setCategories(fetchedCategories as Category[]);
+        }
         
         // Fetch all courses
         const courseData = await getCourses();
         setCourses(courseData as Course[]);
       } catch (error) {
         console.error('Error fetching data:', error);
-        // Use default categories if fetch fails
-        setCategories(defaultCategories);
       } finally {
         setLoading(false);
       }
@@ -119,8 +109,7 @@ export default function CoursesPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <Navbar />
+      <div className="min-h-screen ">
         <div className="flex items-center justify-center h-96">
           <div className="text-xl text-gray-600">Loading courses...</div>
         </div>
@@ -129,26 +118,19 @@ export default function CoursesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navbar />
-      
-      {/* Page Header */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="text-center">
-            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+    <div>
+      <div style={{ backgroundImage: "url('/background.png')" }}>
+     
+    {/* Page Header */}
+          <div className='py-10'>
+              <h1 className="text-3xl text-center md:text-4xl font-bold text-gray-900">
               Explore Courses
             </h1>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Discover amazing courses created by our community. Learn anything for completely free.
-            </p>
           </div>
-        </div>
-      </div>
+          
 
       {/* Search and Filters */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="max-w-7xl  mx-auto px-4 sm:px-6 lg:px-8 pb-6">
           {/* Search Bar */}
           <div className="flex flex-col md:flex-row gap-4 mb-4">
             <div className="flex-1 relative">
@@ -158,7 +140,7 @@ export default function CoursesPage() {
                 placeholder="Search courses..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full bg-white pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2  focus:border-transparent"
               />
               {searchTerm && (
                 <button
@@ -175,7 +157,7 @@ export default function CoursesPage() {
               className={`flex items-center space-x-2 px-4 py-3 border rounded-lg transition-colors ${
                 showFilters 
                   ? 'border-blue-500 bg-blue-50 text-blue-700' 
-                  : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                  : 'border-gray-200 bg-white text-gray-700 hover:'
               }`}
             >
               <FiFilter className="w-5 h-5" />
@@ -190,7 +172,7 @@ export default function CoursesPage() {
 
           {/* Filters Panel */}
           {showFilters && (
-            <div className="bg-gray-50 rounded-lg p-4 space-y-4">
+            <div className=" rounded-lg p-4 space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {/* Category Filter */}
                 <div>
@@ -267,29 +249,22 @@ export default function CoursesPage() {
             </div>
           )}
 
-          {/* Results Summary */}
-          <div className="flex items-center justify-between text-sm text-gray-600 mt-4">
-            <span>
-              {filteredCourses.length} course{filteredCourses.length !== 1 ? 's' : ''} found
-              {selectedCategory && ` in ${categories.find(c => c.id === selectedCategory)?.name}`}
-              {searchTerm && ` for "${searchTerm}"`}
-            </span>
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2">
-                <FiBookOpen className="w-4 h-4 text-blue-600" />
-                <span>{courses.length} total courses</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <FiUsers className="w-4 h-4 text-green-600" />
-                <span>{courses.filter(c => c.isPublic).length} public</span>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
+  {/* course category filter list */}
+  <div className='flex flex-row items-center mt-3 justify-center gap-2'>
+{categories.map((category,index:number)=>{
+  if(index < 5){
+return (
+    <button key={index.toString()} onClick={()=>{setSelectedCategory(category.id)}} className='border border-black rounded-xl p-2'>{category.name}</button>
+  );
+  }
+
+})}
+  </div>
 
       {/* Courses Grid */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
         {filteredCourses.length === 0 && courses.length > 0 ? (
           <div className="text-center py-12">
             <FiSearch className="w-12 h-12 text-gray-400 mx-auto mb-4" />
@@ -430,48 +405,6 @@ export default function CoursesPage() {
         )}
       </div>
 
-      {/* Sample Categories for New Users */}
-      {!user && filteredCourses.length === 0 && courses.length === 0 && (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <h2 className="text-2xl font-semibold text-gray-900 mb-6 text-center">
-            Explore Categories
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {defaultCategories.map((category) => (
-              <div
-                key={category.id}
-                className="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow cursor-pointer group"
-                onClick={() => setSelectedCategory(category.id)}
-              >
-                <div className="aspect-w-16 aspect-h-9">
-                  <img
-                    src={category.image}
-                    alt={category.name}
-                    className="w-full h-48 object-cover rounded-t-lg group-hover:scale-105 transition-transform duration-200"
-                    draggable="false"
-                  />
-                </div>
-                <div className="p-4">
-                  <h3 className="text-lg font-semibold text-gray-900 text-center">
-                    {category.name}
-                  </h3>
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className="text-center mt-8">
-            <p className="text-gray-600 mb-4">
-              Sign up to create and track your learning progress
-            </p>
-            <Link
-              href="/auth/signup"
-              className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
-            >
-              Get Started
-            </Link>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

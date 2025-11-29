@@ -15,7 +15,7 @@ export default function Navbar() {
   const handleLogout = async () => {
     try {
       await logout();
-      router.push('/auth/login');
+      router.push('/');
     } catch (error) {
       console.error('Failed to log out', error);
     }
@@ -26,11 +26,11 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="bg-white  shadow-sm sticky top-0 z-50">
+    <nav className="bg-white shadow-sm sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <div className="flex-shrink-0">
+          <div className="shrink-0">
             <Link href="/" className="text-2xl font-bold text-black">
               Edutube
             </Link>
@@ -38,9 +38,9 @@ export default function Navbar() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:block">
-            <div className="flex items-center space-x-1">
+            <div className={`flex items-center ${ isAdmin && isAdmin() ?  'space-x-1' : ''}`}>
               <Link
-                href="/"
+                href="/courses/"
                 className="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 hover:text-black hover:bg-black/5 transition-all duration-200"
               >
                 Courses
@@ -94,7 +94,7 @@ export default function Navbar() {
                   </div>
                   <div className="flex items-center space-x-3 pl-3 border-l border-gray-200">
                     <div className="flex items-center space-x-2">
-                      <div className="w-8 h-8 bg-gradient-to-r from-black to-purple-500 rounded-full flex items-center justify-center">
+                      <div className="w-8 h-8 bg-black rounded-full flex items-center justify-center">
                         <span className="text-white text-sm font-medium">
                           {user.email?.charAt(0).toUpperCase()}
                         </span>
@@ -121,7 +121,7 @@ export default function Navbar() {
                   </Link>
                   <Link
                     href="/auth/signup"
-                    className="px-4 py-2 rounded-lg text-sm font-medium text-white bg-gradient-to-r from-black to-purple-600 hover:from-black hover:to-purple-700 shadow-sm transition-all duration-200"
+                    className="px-4 py-2 rounded-lg text-sm font-medium text-white bg-black/90 hover:bg-black shadow-sm transition-all duration-200"
                   >
                     Sign Up
                   </Link>
@@ -151,7 +151,7 @@ export default function Navbar() {
         <div className="md:hidden bg-white/95 backdrop-blur-md border-t border-gray-200/50">
           <div className="px-4 pt-2 pb-3 space-y-1">
             <Link
-              href="/"
+              href="/courses/"
               className="block px-4 py-3 rounded-lg text-base font-medium text-gray-700 hover:text-black hover:bg-black/5 transition-all duration-200"
               onClick={() => setIsMobileMenuOpen(false)}
             >
@@ -190,7 +190,7 @@ export default function Navbar() {
                 {isAdmin && isAdmin() && (
                   <Link
                     href="/admin"
-                    className="block px-4 py-3 rounded-lg text-base font-medium text-white bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 transition-all duration-200"
+                    className="block px-4 py-3 rounded-lg text-base font-medium text-gray-700 hover:text-black hover:bg-black/5 transition-all duration-200"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     Admin Panel
@@ -202,7 +202,7 @@ export default function Navbar() {
               <div className="pt-4 border-t border-gray-200/50">
                 <div className="px-4 pb-3">
                   <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-gradient-to-r from-black to-purple-500 rounded-full flex items-center justify-center">
+                    <div className="w-10 h-10 bg-black/10 rounded-full flex items-center justify-center">
                       <span className="text-white font-medium">
                         {user.email?.charAt(0).toUpperCase()}
                       </span>
@@ -233,7 +233,7 @@ export default function Navbar() {
                 </Link>
                 <Link
                   href="/auth/signup"
-                  className="block mx-4 mb-2 px-4 py-3 rounded-lg text-base font-medium text-white bg-gradient-to-r from-black to-purple-600 hover:from-black hover:to-purple-700 transition-all duration-200"
+                  className="block mx-4 mb-2 px-4 py-3 rounded-lg text-base font-medium text-white bg-black/90 hover:bg-black transition-all duration-200"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   Sign Up

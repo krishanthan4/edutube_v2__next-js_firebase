@@ -25,9 +25,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <header>
-        <link rel="shortcut icon" href="logo-removebg-preview.png" type="image/x-icon" />
-      </header>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
