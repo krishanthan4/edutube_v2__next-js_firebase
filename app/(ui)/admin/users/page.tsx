@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { collection, getDocs, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '@/app/lib/firebase';
 import { User } from '@/app/types';
-import { FiEdit2, FiTrash2, FiSearch, FiUserCheck, FiUserX } from 'react-icons/fi';
+import { FiEdit2, FiTrash2, FiSearch, FiUserCheck, FiUserX, FiFilter, FiMoreVertical, FiUsers } from 'react-icons/fi';
 
 export default function UsersManagement() {
   const [users, setUsers] = useState<User[]>([]);
@@ -70,44 +70,50 @@ export default function UsersManagement() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900">Users Management</h1>
-        <p className="text-gray-600">Manage user accounts and permissions</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Users Management</h1>
+          <p className="text-gray-600 mt-1">Manage user accounts and permissions</p>
+        </div>
+        <div className="text-sm text-gray-500">
+          Total: {users.length} users
+        </div>
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="bg-white border border-gray-200 rounded-xl p-6">
+        <div className="flex flex-col sm:flex-row gap-4">
           {/* Search */}
-          <div className="relative">
+          <div className="relative flex-1">
             <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
             <input
               type="text"
               placeholder="Search users..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-gray-900 transition-colors"
             />
           </div>
 
           {/* Role Filter */}
-          <div>
+          <div className="relative">
+            <FiFilter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none" />
             <select
               value={selectedRole}
               onChange={(e) => setSelectedRole(e.target.value as 'all' | 'admin' | 'user')}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="appearance-none pl-10 pr-8 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-gray-900 transition-colors bg-white"
             >
               <option value="all">All Roles</option>
-              <option value="user">User</option>
-              <option value="admin">Admin</option>
+              <option value="user">Users</option>
+              <option value="admin">Admins</option>
             </select>
           </div>
         </div>
@@ -115,70 +121,81 @@ export default function UsersManagement() {
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex items-center">
-            <FiUserCheck className="w-8 h-8 text-blue-600 mr-3" />
+        <div className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-shadow">
+          <div className="flex items-center justify-between">
             <div>
-              <p className="text-2xl font-bold text-gray-900">{users.length}</p>
-              <p className="text-gray-600">Total Users</p>
+              <p className="text-sm font-medium text-gray-600 mb-1">Total Users</p>
+              <p className="text-3xl font-bold text-gray-900">{users.length}</p>
+            </div>
+            <div className="p-3 bg-gray-100 rounded-lg">
+              <FiUserCheck className="w-6 h-6 text-gray-600" />
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex items-center">
-            <FiUserX className="w-8 h-8 text-red-600 mr-3" />
+        <div className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-shadow">
+          <div className="flex items-center justify-between">
             <div>
-              <p className="text-2xl font-bold text-gray-900">
+              <p className="text-sm font-medium text-gray-600 mb-1">Administrators</p>
+              <p className="text-3xl font-bold text-gray-900">
                 {users.filter(u => u.role === 'admin').length}
               </p>
-              <p className="text-gray-600">Admins</p>
+            </div>
+            <div className="p-3 bg-gray-100 rounded-lg">
+              <FiUserX className="w-6 h-6 text-gray-600" />
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex items-center">
-            <FiUserCheck className="w-8 h-8 text-green-600 mr-3" />
+        <div className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-shadow">
+          <div className="flex items-center justify-between">
             <div>
-              <p className="text-2xl font-bold text-gray-900">
+              <p className="text-sm font-medium text-gray-600 mb-1">Regular Users</p>
+              <p className="text-3xl font-bold text-gray-900">
                 {users.filter(u => u.role === 'user').length}
               </p>
-              <p className="text-gray-600">Regular Users</p>
+            </div>
+            <div className="p-3 bg-gray-100 rounded-lg">
+              <FiUserCheck className="w-6 h-6 text-gray-600" />
             </div>
           </div>
         </div>
       </div>
 
       {/* Users Table */}
-      <div className="bg-white rounded-lg shadow overflow-hidden">
+      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900">
-            Users ({filteredUsers.length})
-          </h2>
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold text-gray-900">
+              Users ({filteredUsers.length})
+            </h2>
+            <span className="text-sm text-gray-500">
+              {searchTerm && `Filtered by "${searchTerm}"`}
+            </span>
+          </div>
         </div>
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-900 uppercase tracking-wider">
                   User
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-900 uppercase tracking-wider">
                   Role
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-900 uppercase tracking-wider">
                   Joined
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-900 uppercase tracking-wider">
                   Last Login
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-900 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredUsers.map((user) => (
-                <tr key={user.uid} className="hover:bg-gray-50">
+                <tr key={user.uid} className="hover:bg-gray-50 transition-colors">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       {user.photoURL ? (
@@ -188,8 +205,8 @@ export default function UsersManagement() {
                           className="w-10 h-10 rounded-full mr-4"
                         />
                       ) : (
-                        <div className="w-10 h-10 bg-gray-300 rounded-full mr-4 flex items-center justify-center">
-                          <span className="text-gray-600 text-sm">
+                        <div className="w-10 h-10 bg-gray-900 text-white rounded-full mr-4 flex items-center justify-center">
+                          <span className="text-sm font-medium">
                             {user.email.charAt(0).toUpperCase()}
                           </span>
                         </div>
@@ -198,15 +215,15 @@ export default function UsersManagement() {
                         <p className="text-sm font-medium text-gray-900">
                           {user.displayName || 'No name'}
                         </p>
-                        <p className="text-sm text-gray-500">{user.email}</p>
+                        <p className="text-sm text-gray-600">{user.email}</p>
                       </div>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                    <span className={`inline-flex px-3 py-1 text-xs font-medium rounded-full ${
                       user.role === 'admin' 
-                        ? 'bg-red-100 text-red-800' 
-                        : 'bg-green-100 text-green-800'
+                        ? 'bg-gray-900 text-white' 
+                        : 'bg-gray-100 text-gray-900'
                     }`}>
                       {user.role}
                     </span>
@@ -218,24 +235,23 @@ export default function UsersManagement() {
                     {user.lastLoginAt ? new Date(user.lastLoginAt.toDate()).toLocaleDateString() : 'N/A'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <div className="flex space-x-2">
+                    <div className="flex items-center space-x-2">
                       <button
                         onClick={() => updateUserRole(user.uid, user.role === 'admin' ? 'user' : 'admin')}
-                        className={`p-2 rounded-lg transition-colors ${
-                          user.role === 'admin'
-                            ? 'text-green-600 hover:bg-green-100'
-                            : 'text-red-600 hover:bg-red-100'
-                        }`}
+                        className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
                         title={user.role === 'admin' ? 'Remove admin' : 'Make admin'}
                       >
                         <FiEdit2 className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => deleteUser(user.uid)}
-                        className="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors"
+                        className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
                         title="Delete user"
                       >
                         <FiTrash2 className="w-4 h-4" />
+                      </button>
+                      <button className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
+                        <FiMoreVertical className="w-4 h-4" />
                       </button>
                     </div>
                   </td>
@@ -243,6 +259,14 @@ export default function UsersManagement() {
               ))}
             </tbody>
           </table>
+          
+          {filteredUsers.length === 0 && (
+            <div className="text-center py-12">
+              <FiUsers className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+              <p className="text-gray-600">No users found</p>
+              <p className="text-sm text-gray-500">Try adjusting your search or filter criteria</p>
+            </div>
+          )}
         </div>
       </div>
     </div>

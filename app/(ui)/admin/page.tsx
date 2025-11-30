@@ -1,13 +1,17 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/app/contexts/AuthContext';
+import Link from 'next/link';
 import { 
   FiUsers, 
   FiBookOpen, 
   FiFile, 
   FiTrendingUp,
   FiEye,
-  FiPlus
+  FiPlus,
+  FiArrowUpRight,
+  FiActivity,
+  FiClock
 } from 'react-icons/fi';
 
 interface DashboardStats {
@@ -40,17 +44,19 @@ export default function AdminDashboard() {
       // TODO: Implement actual data fetching from Firestore
       // For now, using mock data
       setStats({
-        totalUsers: 150,
-        totalCourses: 25,
-        totalGuidances: 45,
-        totalViews: 1250,
+        totalUsers: 1247,
+        totalCourses: 58,
+        totalGuidances: 127,
+        totalViews: 23456,
         recentUsers: [
-          { id: '1', email: 'user1@example.com', createdAt: new Date() },
-          { id: '2', email: 'user2@example.com', createdAt: new Date() },
+          { id: '1', email: 'john.doe@example.com', createdAt: new Date() },
+          { id: '2', email: 'jane.smith@example.com', createdAt: new Date() },
+          { id: '3', email: 'mike.johnson@example.com', createdAt: new Date() },
         ],
         recentCourses: [
-          { id: '1', title: 'React Basics', createdAt: new Date() },
-          { id: '2', title: 'Node.js Advanced', createdAt: new Date() },
+          { id: '1', title: 'Advanced React Patterns', createdAt: new Date() },
+          { id: '2', title: 'Node.js Microservices', createdAt: new Date() },
+          { id: '3', title: 'TypeScript Fundamentals', createdAt: new Date() },
         ]
       });
     } catch (error) {
@@ -63,7 +69,7 @@ export default function AdminDashboard() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
       </div>
     );
   }
@@ -71,140 +77,192 @@ export default function AdminDashboard() {
   const statCards = [
     {
       title: 'Total Users',
-      value: stats.totalUsers,
+      value: stats.totalUsers.toLocaleString(),
       icon: FiUsers,
-      color: 'bg-blue-500',
-      href: '/admin/users'
+      href: '/admin/users',
+      change: '+12.5%',
+      changeType: 'increase'
     },
     {
       title: 'Total Courses',
-      value: stats.totalCourses,
+      value: stats.totalCourses.toLocaleString(),
       icon: FiBookOpen,
-      color: 'bg-green-500',
-      href: '/admin/courses'
+      href: '/admin/courses',
+      change: '+8.2%',
+      changeType: 'increase'
     },
     {
       title: 'Total Guidances',
-      value: stats.totalGuidances,
+      value: stats.totalGuidances.toLocaleString(),
       icon: FiFile,
-      color: 'bg-purple-500',
-      href: '/admin/guidances'
+      href: '/admin/guidances',
+      change: '+15.3%',
+      changeType: 'increase'
     },
     {
       title: 'Total Views',
-      value: stats.totalViews,
+      value: stats.totalViews.toLocaleString(),
       icon: FiEye,
-      color: 'bg-orange-500',
-      href: '/admin/analytics'
+      href: '/admin',
+      change: '+23.1%',
+      changeType: 'increase'
     }
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-          <p className="text-gray-600">Welcome back, {userProfile?.displayName || 'Admin'}</p>
+          <h1 className="text-3xl font-bold text-gray-900">Dashboard Overview</h1>
+          <p className="text-gray-600 mt-1">Monitor your platform's performance and activity</p>
         </div>
-        <div className="flex space-x-4">
-          <button className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
-            <FiPlus className="w-4 h-4" />
-            <span>New Course</span>
-          </button>
-          <button className="flex items-center space-x-2 bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors">
-            <FiPlus className="w-4 h-4" />
-            <span>New Guidance</span>
-          </button>
+        <div className="flex space-x-3">
+          <Link
+            href="/admin/courses/create"
+            className="inline-flex items-center px-4 py-2 bg-black text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors"
+          >
+            <FiPlus className="w-4 h-4 mr-2" />
+            Add Course
+          </Link>
         </div>
       </div>
 
-      {/* Stats Cards */}
+      {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {statCards.map((card, index) => {
           const Icon = card.icon;
           return (
-            <div key={index} className="bg-white rounded-lg shadow p-6">
-              <div className="flex items-center">
-                <div className={`${card.color} rounded-lg p-3 text-white mr-4`}>
+            <Link
+              key={index}
+              href={card.href}
+              className="bg-white p-6 border border-gray-200 rounded-xl hover:shadow-lg transition-all duration-200 group"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <div className="p-3 bg-gray-100 rounded-lg group-hover:bg-black group-hover:text-white transition-colors">
                   <Icon className="w-6 h-6" />
                 </div>
-                <div>
-                  <p className="text-2xl font-bold text-gray-900">{card.value}</p>
-                  <p className="text-gray-600">{card.title}</p>
-                </div>
+                <FiArrowUpRight className="w-5 h-5 text-gray-400 group-hover:text-gray-900 transition-colors" />
               </div>
-            </div>
+              <div>
+                <p className="text-sm font-medium text-gray-600 mb-1">{card.title}</p>
+                <p className="text-2xl font-bold text-gray-900 mb-1">{card.value}</p>
+                <p className="text-sm text-green-600 font-medium">{card.change}</p>
+              </div>
+            </Link>
           );
         })}
       </div>
 
-      {/* Recent Activity */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* Recent Activity Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Recent Users */}
-        <div className="bg-white rounded-lg shadow">
-          <div className="p-6 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900">Recent Users</h2>
-          </div>
-          <div className="p-6">
-            <div className="space-y-4">
-              {stats.recentUsers.map((user) => (
-                <div key={user.id} className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium text-gray-900">{user.email}</p>
-                    <p className="text-sm text-gray-500">
-                      Joined {new Date(user.createdAt).toLocaleDateString()}
-                    </p>
-                  </div>
-                  <button className="text-blue-600 hover:text-blue-800">View</button>
-                </div>
-              ))}
+        <div className="bg-white border border-gray-200 rounded-xl p-6">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="text-lg font-semibold text-gray-900">Recent Users</h2>
+              <p className="text-sm text-gray-600">New user registrations</p>
             </div>
+            <Link
+              href="/admin/users"
+              className="text-sm text-gray-600 hover:text-gray-900 font-medium"
+            >
+              View all →
+            </Link>
+          </div>
+          <div className="space-y-4">
+            {stats.recentUsers.map((user, index) => (
+              <div key={user.id} className="flex items-center space-x-4 p-3 bg-gray-50 rounded-lg">
+                <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
+                  <FiUsers className="w-4 h-4 text-gray-600" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-gray-900 truncate">{user.email}</p>
+                  <p className="text-xs text-gray-600 flex items-center">
+                    <FiClock className="w-3 h-3 mr-1" />
+                    {user.createdAt.toLocaleDateString()}
+                  </p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 
         {/* Recent Courses */}
-        <div className="bg-white rounded-lg shadow">
-          <div className="p-6 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900">Recent Courses</h2>
-          </div>
-          <div className="p-6">
-            <div className="space-y-4">
-              {stats.recentCourses.map((course) => (
-                <div key={course.id} className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium text-gray-900">{course.title}</p>
-                    <p className="text-sm text-gray-500">
-                      Created {new Date(course.createdAt).toLocaleDateString()}
-                    </p>
-                  </div>
-                  <button className="text-blue-600 hover:text-blue-800">View</button>
-                </div>
-              ))}
+        <div className="bg-white border border-gray-200 rounded-xl p-6">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="text-lg font-semibold text-gray-900">Recent Courses</h2>
+              <p className="text-sm text-gray-600">Latest course additions</p>
             </div>
+            <Link
+              href="/admin/courses"
+              className="text-sm text-gray-600 hover:text-gray-900 font-medium"
+            >
+              View all →
+            </Link>
+          </div>
+          <div className="space-y-4">
+            {stats.recentCourses.map((course, index) => (
+              <div key={course.id} className="flex items-center space-x-4 p-3 bg-gray-50 rounded-lg">
+                <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
+                  <FiBookOpen className="w-4 h-4 text-gray-600" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-gray-900 truncate">{course.title}</p>
+                  <p className="text-xs text-gray-600 flex items-center">
+                    <FiClock className="w-3 h-3 mr-1" />
+                    {course.createdAt.toLocaleDateString()}
+                  </p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
 
       {/* Quick Actions */}
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="bg-white border border-gray-200 rounded-xl p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <button className="p-4 border border-gray-200 rounded-lg text-left hover:bg-gray-50 transition-colors">
-            <FiUsers className="w-6 h-6 text-blue-600 mb-2" />
-            <h3 className="font-medium text-gray-900">Manage Users</h3>
-            <p className="text-sm text-gray-600">View and manage user accounts</p>
-          </button>
-          <button className="p-4 border border-gray-200 rounded-lg text-left hover:bg-gray-50 transition-colors">
-            <FiBookOpen className="w-6 h-6 text-green-600 mb-2" />
-            <h3 className="font-medium text-gray-900">Manage Courses</h3>
-            <p className="text-sm text-gray-600">Review and moderate courses</p>
-          </button>
-          <button className="p-4 border border-gray-200 rounded-lg text-left hover:bg-gray-50 transition-colors">
-            <FiTrendingUp className="w-6 h-6 text-purple-600 mb-2" />
-            <h3 className="font-medium text-gray-900">View Analytics</h3>
-            <p className="text-sm text-gray-600">See platform performance</p>
-          </button>
+          <Link
+            href="/admin/courses/create"
+            className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            <div className="p-2 bg-gray-100 rounded-lg mr-4">
+              <FiPlus className="w-5 h-5 text-gray-600" />
+            </div>
+            <div>
+              <p className="font-medium text-gray-900">Create Course</p>
+              <p className="text-sm text-gray-600">Add a new course</p>
+            </div>
+          </Link>
+          
+          <Link
+            href="/admin/guidances/create"
+            className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            <div className="p-2 bg-gray-100 rounded-lg mr-4">
+              <FiFile className="w-5 h-5 text-gray-600" />
+            </div>
+            <div>
+              <p className="font-medium text-gray-900">Create Guidance</p>
+              <p className="text-sm text-gray-600">Add new guidance</p>
+            </div>
+          </Link>
+          
+          <Link
+            href="/admin/pathways/create"
+            className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            <div className="p-2 bg-gray-100 rounded-lg mr-4">
+              <FiTrendingUp className="w-5 h-5 text-gray-600" />
+            </div>
+            <div>
+              <p className="font-medium text-gray-900">Create Pathway</p>
+              <p className="text-sm text-gray-600">Add learning pathway</p>
+            </div>
+          </Link>
         </div>
       </div>
     </div>
